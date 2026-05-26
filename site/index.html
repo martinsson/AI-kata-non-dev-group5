@@ -3,194 +3,80 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>AgroAssistant</title>
-  <link rel="preconnect" href="https://unpkg.com" />
+  <title>AgroAssistant — Diagnostic végétal</title>
   <link rel="stylesheet" href="styles.css" />
-  <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
 </head>
 <body>
-  <div id="overlay" class="overlay"></div>
 
-  <div class="layout">
-    <aside class="sidebar" id="sidebar">
-      <div class="sidebar-brand">
-        <div class="brand-icon"><i data-lucide="leaf"></i></div>
+  <!-- ── En-tête ────────────────────────────────────────── -->
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-logo">
+        <i data-lucide="leaf"></i>
+      </div>
+      <div class="brand-text">
         <span class="brand-name">AgroAssistant</span>
+        <span class="brand-tag">Diagnostic végétal</span>
       </div>
-
-      <nav class="sidebar-nav">
-        <p class="nav-section-label">Navigation</p>
-        <a class="nav-item" data-view="diagnostic">
-          <i data-lucide="stethoscope"></i><span>Diagnostic</span>
-        </a>
-        <a class="nav-item" data-view="garden">
-          <i data-lucide="sprout"></i><span>Mon jardin</span>
-        </a>
-        <a class="nav-item" data-view="history">
-          <i data-lucide="history"></i><span>Historique</span>
-        </a>
-        <a class="nav-item" data-view="guide">
-          <i data-lucide="book-open"></i><span>Guide des maladies</span>
-        </a>
-      </nav>
-
-      <div class="sidebar-footer">
-        <p class="nav-section-label">Données</p>
-        <button id="export-btn" class="sidebar-action">
-          <i data-lucide="download"></i><span>Exporter JSON</span>
-        </button>
-        <button id="import-btn" class="sidebar-action">
-          <i data-lucide="upload"></i><span>Importer JSON</span>
-        </button>
-        <input id="import-file" type="file" accept="application/json" hidden />
-      </div>
-    </aside>
-
-    <div class="main-wrapper">
-      <header class="topbar">
-        <button id="menu-toggle" class="menu-toggle" aria-label="Ouvrir le menu">
-          <i data-lucide="menu"></i>
-        </button>
-        <h1 id="page-title">Diagnostic</h1>
-      </header>
-      <main id="app" class="content"></main>
     </div>
-  </div>
+    <nav class="desktop-nav" id="desktop-nav">
+      <button class="nav-btn" data-view="diagnostic">
+        <i data-lucide="stethoscope"></i><span>Diagnostic</span>
+      </button>
+      <button class="nav-btn" data-view="garden">
+        <i data-lucide="sprout"></i><span>Mon Jardin</span>
+      </button>
+      <button class="nav-btn" data-view="guide">
+        <i data-lucide="book-open"></i><span>Guide</span>
+      </button>
+      <button class="nav-btn" data-view="history">
+        <i data-lucide="clock"></i><span>Historique</span>
+      </button>
+    </nav>
+    <div class="header-actions">
+      <button class="btn-icon-sm" id="export-btn" title="Exporter">
+        <i data-lucide="download"></i>
+      </button>
+      <label class="btn-icon-sm" title="Importer">
+        <i data-lucide="upload"></i>
+        <input type="file" id="import-file" accept="application/json" hidden />
+      </label>
+    </div>
+  </header>
 
-  <!-- ── Template: Diagnostic ───────────────────────────── -->
-  <template id="tpl-diagnostic">
-    <section class="view">
-      <div class="wizard-card">
-        <div class="wizard-header">
-          <i data-lucide="stethoscope"></i>
-          <div>
-            <h2>Diagnostic de plantation</h2>
-            <p class="wizard-sub">Décrivez votre problème et obtenez des conseils personnalisés</p>
-          </div>
-        </div>
+  <!-- ── Contenu principal ──────────────────────────────── -->
+  <main id="app" class="app-main"></main>
 
-        <form id="diag-form" class="diag-form">
-          <div class="form-section">
-            <h3 class="form-section-title"><i data-lucide="sprout"></i> Quelle plante est concernée ?</h3>
-            <div class="plant-grid" id="plant-grid"></div>
-            <div class="field mt-sm">
-              <label for="plant-custom">Autre plante (précisez)</label>
-              <input type="text" id="plant-custom" placeholder="Ex: basilic, pêcher…" />
-            </div>
-          </div>
-
-          <div class="form-section">
-            <h3 class="form-section-title"><i data-lucide="eye"></i> Quels symptômes observez-vous ? <span class="hint">(plusieurs choix possibles)</span></h3>
-            <div class="symptom-grid" id="symptom-grid"></div>
-          </div>
-
-          <div class="form-section">
-            <h3 class="form-section-title"><i data-lucide="map-pin"></i> Quelle partie est touchée ?</h3>
-            <div class="tag-group" id="part-group"></div>
-          </div>
-
-          <div class="form-section">
-            <h3 class="form-section-title"><i data-lucide="cloud-sun"></i> Conditions actuelles</h3>
-            <div class="conditions-grid">
-              <div class="field">
-                <label for="weather">Météo récente</label>
-                <select id="weather">
-                  <option value="">Non précisé</option>
-                  <option value="humid">Humide / pluvieux</option>
-                  <option value="dry">Sec / canicule</option>
-                  <option value="cold">Froid / gelées</option>
-                  <option value="normal">Normal</option>
-                </select>
-              </div>
-              <div class="field">
-                <label for="soil">Type de sol</label>
-                <select id="soil">
-                  <option value="">Non précisé</option>
-                  <option value="clay">Argileux</option>
-                  <option value="sandy">Sableux</option>
-                  <option value="loam">Limoneux</option>
-                  <option value="peat">Tourbeux</option>
-                </select>
-              </div>
-              <div class="field">
-                <label for="watering">Arrosage</label>
-                <select id="watering">
-                  <option value="">Non précisé</option>
-                  <option value="over">Trop arrosé</option>
-                  <option value="under">Pas assez arrosé</option>
-                  <option value="correct">Correct</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <div class="form-section">
-            <label class="field">
-              <span class="field-label"><i data-lucide="message-square"></i> Description libre (optionnel)</span>
-              <textarea id="description" rows="3" placeholder="Décrivez ce que vous observez en détail…"></textarea>
-            </label>
-          </div>
-
-          <div class="diag-actions">
-            <button type="reset" class="btn-secondary"><i data-lucide="rotate-ccw"></i>Réinitialiser</button>
-            <button type="submit" class="btn-primary"><i data-lucide="search"></i>Analyser</button>
-          </div>
-        </form>
-      </div>
-
-      <div id="diag-result" class="diag-result hidden"></div>
-    </section>
-  </template>
-
-  <!-- ── Template: Mon jardin ───────────────────────────── -->
-  <template id="tpl-garden">
-    <section class="view">
-      <div class="view-header">
-        <div class="view-title"><i data-lucide="sprout"></i><h2>Mon jardin</h2></div>
-        <button class="btn-primary" data-action="add"><i data-lucide="plus"></i>Ajouter une plante</button>
-      </div>
-      <div id="garden-grid" class="plant-cards"></div>
-    </section>
-  </template>
-
-  <!-- ── Template: Historique ───────────────────────────── -->
-  <template id="tpl-history">
-    <section class="view">
-      <div class="view-header">
-        <div class="view-title"><i data-lucide="history"></i><h2>Historique des diagnostics</h2></div>
-        <button class="btn-danger" id="clear-history"><i data-lucide="trash-2"></i>Tout effacer</button>
-      </div>
-      <div id="history-list" class="history-list"></div>
-    </section>
-  </template>
-
-  <!-- ── Template: Guide ────────────────────────────────── -->
-  <template id="tpl-guide">
-    <section class="view">
-      <div class="view-header">
-        <div class="view-title"><i data-lucide="book-open"></i><h2>Guide des maladies</h2></div>
-      </div>
-      <div class="guide-search-wrap">
-        <div class="search-box">
-          <i data-lucide="search"></i>
-          <input type="text" id="guide-search" placeholder="Rechercher une maladie ou une plante…" />
-        </div>
-      </div>
-      <div id="disease-list" class="disease-cards"></div>
-    </section>
-  </template>
+  <!-- ── Navigation mobile ─────────────────────────────── -->
+  <nav class="mobile-nav">
+    <button class="mob-btn" data-view="diagnostic">
+      <i data-lucide="stethoscope"></i><span>Diagnostic</span>
+    </button>
+    <button class="mob-btn" data-view="garden">
+      <i data-lucide="sprout"></i><span>Jardin</span>
+    </button>
+    <button class="mob-btn" data-view="guide">
+      <i data-lucide="book-open"></i><span>Guide</span>
+    </button>
+    <button class="mob-btn" data-view="history">
+      <i data-lucide="clock"></i><span>Historique</span>
+    </button>
+  </nav>
 
   <!-- ── Modal ──────────────────────────────────────────── -->
   <div id="modal" class="modal" hidden>
     <div class="modal-card">
       <header class="modal-header">
-        <h3 id="modal-title">Modifier</h3>
-        <button class="btn-icon" id="modal-close" aria-label="Fermer"><i data-lucide="x"></i></button>
+        <h3 id="modal-title"></h3>
+        <button class="btn-icon" id="modal-close" aria-label="Fermer">
+          <i data-lucide="x"></i>
+        </button>
       </header>
       <form id="modal-form"></form>
     </div>
   </div>
 
+  <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

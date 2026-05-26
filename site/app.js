@@ -1,48 +1,27 @@
 (() => {
   'use strict';
 
-  const STORAGE_KEY = 'agroassistant-v1';
+  const STORAGE_KEY = 'agroassistant-v2';
 
-  // ── Knowledge base ─────────────────────────────────────
+  // ── Base de connaissances ──────────────────────────────
 
   const PLANTS = [
-    { id: 'tomato',   label: 'Tomate',       icon: '🍅' },
-    { id: 'potato',   label: 'Pomme de terre',icon: '🥔' },
-    { id: 'rose',     label: 'Rose',          icon: '🌹' },
-    { id: 'wheat',    label: 'Blé',           icon: '🌾' },
-    { id: 'corn',     label: 'Maïs',          icon: '🌽' },
-    { id: 'zucchini', label: 'Courgette',     icon: '🥒' },
-    { id: 'cucumber', label: 'Concombre',     icon: '🥒' },
-    { id: 'vine',     label: 'Vigne',         icon: '🍇' },
-    { id: 'apple',    label: 'Pommier',       icon: '🍎' },
-    { id: 'lettuce',  label: 'Laitue',        icon: '🥬' },
-    { id: 'strawberry', label: 'Fraisier',    icon: '🍓' },
-    { id: 'bean',     label: 'Haricot',       icon: '🫘' },
-  ];
-
-  const SYMPTOMS = [
-    { id: 'yellow_leaves',   label: 'Feuilles jaunissantes',       icon: 'leaf' },
-    { id: 'brown_spots',     label: 'Taches brunes',               icon: 'circle-dot' },
-    { id: 'white_powder',    label: 'Poudre / taches blanches',    icon: 'cloud-snow' },
-    { id: 'gray_mold',       label: 'Moisissure grise',            icon: 'cloud' },
-    { id: 'black_spots',     label: 'Taches noires',               icon: 'minus-circle' },
-    { id: 'wilting',         label: 'Flétrissement / affaissement',icon: 'trending-down' },
-    { id: 'root_rot',        label: 'Pourriture à la base / racines',icon: 'alert-triangle' },
-    { id: 'holes',           label: 'Trous dans les feuilles',     icon: 'scissors' },
-    { id: 'vein_discolor',   label: 'Décoloration des nervures',   icon: 'git-branch' },
-    { id: 'leaf_drop',       label: 'Chute prématurée des feuilles',icon: 'wind' },
-    { id: 'fruit_spots',     label: 'Fruits tachetés / pourris',   icon: 'alert-circle' },
-    { id: 'slow_growth',     label: 'Croissance ralentie',         icon: 'arrow-down-narrow-wide' },
-    { id: 'sticky',          label: 'Feuilles collantes / miellat',icon: 'droplets' },
-    { id: 'curled_leaves',   label: 'Feuilles enroulées / crispées',icon: 'refresh-cw' },
-  ];
-
-  const PARTS = [
-    { id: 'leaves', label: 'Feuilles' },
-    { id: 'stem',   label: 'Tiges / tige' },
-    { id: 'roots',  label: 'Racines' },
-    { id: 'fruits', label: 'Fruits / fleurs' },
-    { id: 'whole',  label: 'Plante entière' },
+    { id: 'tomato',     label: 'Tomate',          icon: '🍅' },
+    { id: 'potato',     label: 'Pomme de terre',   icon: '🥔' },
+    { id: 'rose',       label: 'Rose',             icon: '🌹' },
+    { id: 'wheat',      label: 'Blé',              icon: '🌾' },
+    { id: 'corn',       label: 'Maïs',             icon: '🌽' },
+    { id: 'zucchini',   label: 'Courgette',        icon: '🥒' },
+    { id: 'cucumber',   label: 'Concombre',        icon: '🥒' },
+    { id: 'vine',       label: 'Vigne',            icon: '🍇' },
+    { id: 'apple',      label: 'Pommier',          icon: '🍎' },
+    { id: 'lettuce',    label: 'Laitue',           icon: '🥬' },
+    { id: 'strawberry', label: 'Fraisier',         icon: '🍓' },
+    { id: 'bean',       label: 'Haricot',          icon: '🫘' },
+    { id: 'pepper',     label: 'Poivron / Piment', icon: '🫑' },
+    { id: 'basil',      label: 'Basilic',          icon: '🌿' },
+    { id: 'carrot',     label: 'Carotte',          icon: '🥕' },
+    { id: 'garlic',     label: 'Ail / Oignon',     icon: '🧄' },
   ];
 
   const DISEASES = [
@@ -51,16 +30,15 @@
       name: 'Mildiou',
       pathogen: 'Phytophthora infestans / Plasmopara viticola',
       plants: ['tomato', 'potato', 'vine', 'lettuce'],
-      symptoms: ['brown_spots', 'yellow_leaves', 'gray_mold', 'leaf_drop'],
-      conditions: ['humid'],
+      keywords: ['brun', 'tache', 'duvet', 'gris', 'humide', 'mouillé', 'mildiou', 'jaun', 'chute'],
       severity: 'high',
       description: 'Maladie fongique très répandue favorisée par l\'humidité et la chaleur. Se manifeste par des taches brunes sur les feuilles avec un duvet grisâtre sous la feuille.',
       treatments: [
-        'Traiter à la bouillie bordelaise (cuivre) dès les premiers symptômes',
+        'Traitement à la bouillie bordelaise (cuivre) dès les premiers symptômes',
         'Retirer et détruire les parties atteintes (ne pas composter)',
-        'Éviter d\'arroser le feuillage, arroser au pied',
+        'Arroser au pied uniquement, jamais sur le feuillage',
         'Améliorer la circulation d\'air entre les plants',
-        'En préventif : pulvérisations de décoction de prêle',
+        'Pulvérisations préventives de décoction de prêle',
       ],
       prevention: 'Choisir des variétés résistantes, respecter les distances de plantation, éviter l\'excès d\'humidité.',
     },
@@ -68,17 +46,15 @@
       id: 'powdery_mildew',
       name: 'Oïdium',
       pathogen: 'Erysiphales (diverses espèces)',
-      plants: ['rose', 'zucchini', 'cucumber', 'vine', 'apple', 'strawberry'],
-      symptoms: ['white_powder', 'curled_leaves', 'leaf_drop'],
-      conditions: ['humid', 'normal'],
+      plants: ['rose', 'zucchini', 'cucumber', 'vine', 'apple', 'strawberry', 'pepper'],
+      keywords: ['blanc', 'blanche', 'poudre', 'farin', 'oïdi', 'enroulé', 'crispé'],
       severity: 'medium',
-      description: 'Champignon superficiel qui recouvre les feuilles d\'un feutrage blanc poudreux. Favorisé par des nuits fraîches et journées chaudes.',
+      description: 'Champignon superficiel qui recouvre les feuilles d\'un feutrage blanc poudreux. Favorisé par des nuits fraîches et journées chaudes avec humidité.',
       treatments: [
-        'Pulvériser du soufre micronisé (fongicide homologué)',
-        'Solution de bicarbonate de soude (1 c. à soupe/litre) + quelques gouttes de savon',
+        'Soufre micronisé en pulvérisation (fongicide homologué)',
+        'Solution de bicarbonate de soude (1 c. à soupe/litre) + quelques gouttes de savon noir',
         'Huile de neem en pulvérisation hebdomadaire',
         'Retirer les parties fortement atteintes',
-        'Purin de prêle en préventif',
       ],
       prevention: 'Aérer les plants, éviter les excès d\'azote, arroser le matin.',
     },
@@ -87,15 +63,14 @@
       name: 'Rouille',
       pathogen: 'Puccinia spp. / Phragmidium spp.',
       plants: ['rose', 'wheat', 'corn', 'bean'],
-      symptoms: ['brown_spots', 'black_spots', 'yellow_leaves', 'leaf_drop'],
-      conditions: ['humid', 'normal'],
+      keywords: ['rouille', 'orange', 'pustule', 'brun-rouge', 'brun', 'noir', 'chute'],
       severity: 'medium',
       description: 'Maladie fongique se manifestant par des pustules orangées à brun-noir sur les feuilles, souvent visibles sur la face inférieure.',
       treatments: [
-        'Traitement fongicide à base de triazole',
+        'Fongicide à base de triazole',
         'Enlever et détruire les feuilles atteintes',
         'Bouillie bordelaise en début d\'attaque',
-        'Nettoyer soigneusement les outils',
+        'Nettoyer soigneusement les outils entre chaque plant',
       ],
       prevention: 'Rotation des cultures, variétés résistantes, éviter le feuillage mouillé.',
     },
@@ -103,17 +78,16 @@
       id: 'botrytis',
       name: 'Pourriture grise (Botrytis)',
       pathogen: 'Botrytis cinerea',
-      plants: ['tomato', 'strawberry', 'vine', 'lettuce', 'rose', 'bean'],
-      symptoms: ['gray_mold', 'root_rot', 'brown_spots', 'fruit_spots'],
-      conditions: ['humid'],
+      plants: ['tomato', 'strawberry', 'vine', 'lettuce', 'rose', 'bean', 'pepper'],
+      keywords: ['gris', 'moisissure', 'duvet', 'pourr', 'botrytis', 'brun', 'fruit', 'humide'],
       severity: 'high',
-      description: 'Champignon ubiquiste qui attaque les parties affaiblies ou blessées. Se reconnaît au duvet gris caractéristique sur les tissus pourris.',
+      description: 'Champignon ubiquiste attaquant les parties affaiblies ou blessées. Se reconnaît au duvet gris caractéristique sur les tissus pourris.',
       treatments: [
         'Améliorer impérativement la ventilation',
         'Retirer toutes les parties atteintes et détruire',
         'Éviter les blessures sur les plantes',
         'Réduire l\'humidité ambiante',
-        'Fongicide spécifique (iprodione ou pyrimethanil) si nécessaire',
+        'Fongicide spécifique si nécessaire',
       ],
       prevention: 'Bonne aération, ne pas surplanter, éviter l\'arrosage le soir.',
     },
@@ -122,25 +96,23 @@
       name: 'Chlorose ferrique',
       pathogen: 'Carence en fer (non-pathogène)',
       plants: ['rose', 'vine', 'apple', 'strawberry', 'tomato'],
-      symptoms: ['yellow_leaves', 'vein_discolor', 'slow_growth'],
-      conditions: [],
+      keywords: ['jaun', 'pâle', 'nervure', 'veine', 'chlorose', 'fer', 'décolor'],
       severity: 'low',
-      description: 'Jaunissement du limbe entre les nervures qui restent vertes. Dû à une carence en fer, souvent lié à un pH du sol trop élevé.',
+      description: 'Jaunissement du limbe entre les nervures qui restent vertes. Dû à une carence en fer, souvent liée à un pH du sol trop élevé (sol calcaire).',
       treatments: [
-        'Apporter du chélate de fer (disponible en jardinerie)',
+        'Apport de chélate de fer (disponible en jardinerie)',
         'Abaisser le pH du sol avec de la tourbe ou du soufre',
-        'Arroser avec de l\'eau de pluie plutôt que de l\'eau calcaire',
+        'Arroser avec de l\'eau de pluie plutôt que l\'eau calcaire',
         'Traitement foliaire au sulfate de fer dilué',
       ],
-      prevention: 'Vérifier et corriger le pH du sol avant plantation. Éviter les excès de calcaire.',
+      prevention: 'Vérifier et corriger le pH du sol avant plantation.',
     },
     {
       id: 'root_rot',
-      name: 'Pourriture racinaire / Fonte des semis',
+      name: 'Pourriture racinaire',
       pathogen: 'Pythium spp. / Rhizoctonia solani',
-      plants: ['tomato', 'cucumber', 'zucchini', 'lettuce', 'bean'],
-      symptoms: ['wilting', 'root_rot', 'yellow_leaves', 'slow_growth'],
-      conditions: ['humid', 'over'],
+      plants: ['tomato', 'cucumber', 'zucchini', 'lettuce', 'bean', 'pepper', 'basil'],
+      keywords: ['racine', 'pourr', 'flétr', 'fané', 'affaiss', 'trop arros', 'stagnant', 'collet', 'base', 'sol'],
       severity: 'high',
       description: 'Pourriture des racines et du collet causée par des champignons du sol, favorisée par un excès d\'humidité et des sols peu drainants.',
       treatments: [
@@ -156,9 +128,8 @@
       id: 'alternaria',
       name: 'Alternariose',
       pathogen: 'Alternaria solani',
-      plants: ['tomato', 'potato', 'corn'],
-      symptoms: ['brown_spots', 'black_spots', 'leaf_drop', 'fruit_spots'],
-      conditions: ['humid', 'normal'],
+      plants: ['tomato', 'potato', 'corn', 'carrot'],
+      keywords: ['concentrique', 'cible', 'alternaria', 'brun', 'noir', 'chute', 'fruit'],
       severity: 'medium',
       description: 'Taches brunes à noires concentriques sur les feuilles et les fruits, ressemblant à des cibles. Favorisée par des temps chauds et humides.',
       treatments: [
@@ -173,34 +144,30 @@
       id: 'aphids',
       name: 'Pucerons',
       pathogen: 'Insectes (Aphididae)',
-      plants: ['rose', 'bean', 'lettuce', 'apple', 'tomato', 'zucchini'],
-      symptoms: ['curled_leaves', 'yellow_leaves', 'sticky', 'slow_growth'],
-      conditions: [],
+      plants: ['rose', 'bean', 'lettuce', 'apple', 'tomato', 'zucchini', 'pepper', 'basil'],
+      keywords: ['collant', 'miellat', 'puceron', 'insecte', 'enroulé', 'crispe', 'vert', 'noir', 'petits'],
       severity: 'medium',
-      description: 'Petits insectes (verts, noirs, gris) qui colonisent les nouvelles pousses et le dessous des feuilles. Ils sécrètent un miellat collant propice à la fumagine.',
+      description: 'Petits insectes colonisant les nouvelles pousses et le dessous des feuilles. Ils sécrètent un miellat collant propice à la fumagine.',
       treatments: [
-        'Savon noir dilué en pulvérisation (2 c. à soupe/litre)',
+        'Savon noir dilué en pulvérisation (2 c. à soupe / litre)',
         'Pyréthrine végétale si infestation forte',
         'Favoriser les prédateurs naturels (coccinelles, chrysopes)',
-        'Jet d\'eau fort pour les déloger mécaniquement',
-        'Purin d\'ortie en préventif',
+        'Jet d\'eau puissant pour les déloger mécaniquement',
       ],
-      prevention: 'Plantation d\'œillets d\'Inde repoussants, éviter les excès d\'azote, surveiller régulièrement.',
+      prevention: 'Plantation d\'œillets d\'Inde, éviter les excès d\'azote, surveiller régulièrement.',
     },
     {
       id: 'nitrogen',
       name: 'Carence en azote',
       pathogen: 'Carence nutritive (non-pathogène)',
-      plants: ['tomato', 'corn', 'lettuce', 'wheat', 'zucchini'],
-      symptoms: ['yellow_leaves', 'slow_growth'],
-      conditions: ['dry'],
+      plants: ['tomato', 'corn', 'lettuce', 'wheat', 'zucchini', 'pepper'],
+      keywords: ['jaun', 'pâle', 'chétif', 'lent', 'croissance', 'azote', 'engrais'],
       severity: 'low',
-      description: 'Jaunissement général des feuilles, commençant par les plus vieilles. La plante présente un aspect chétif avec une croissance très ralentie.',
+      description: 'Jaunissement général des feuilles commençant par les plus vieilles. La plante présente un aspect chétif avec une croissance très ralentie.',
       treatments: [
         'Apport d\'engrais azoté (orties fermentées, corne broyée)',
         'Purin d\'ortie concentré dilué à 10%',
         'Engrais soluble à libération rapide en urgence',
-        'Améliorer la vie biologique du sol (compost)',
       ],
       prevention: 'Apport régulier de compost mature, rotation des cultures avec des légumineuses.',
     },
@@ -208,13 +175,12 @@
       id: 'caterpillar',
       name: 'Chenilles / larves',
       pathogen: 'Insectes (Lépidoptères, Coléoptères)',
-      plants: ['tomato', 'corn', 'cabbage', 'apple', 'lettuce'],
-      symptoms: ['holes', 'fruit_spots', 'leaf_drop'],
-      conditions: [],
+      plants: ['tomato', 'corn', 'apple', 'lettuce', 'carrot'],
+      keywords: ['trou', 'rongé', 'mangé', 'percé', 'chenille', 'larve', 'insecte'],
       severity: 'medium',
       description: 'Dégâts mécaniques caractéristiques : trous irréguliers dans les feuilles, galeries dans les fruits, déjections visibles.',
       treatments: [
-        'Bacillus thuringiensis (Bt) — biopesticide efficace et sans danger',
+        'Bacillus thuringiensis (Bt) — biopesticide efficace',
         'Ramassage manuel des chenilles (de préférence le soir)',
         'Filets de protection anti-insectes',
         'Décoction de tanaisie ou d\'absinthe en répulsif',
@@ -226,10 +192,9 @@
       name: 'Fusariose',
       pathogen: 'Fusarium oxysporum',
       plants: ['tomato', 'wheat', 'corn', 'bean', 'strawberry'],
-      symptoms: ['wilting', 'vein_discolor', 'slow_growth', 'root_rot'],
-      conditions: ['humid', 'normal'],
+      keywords: ['flétr', 'fané', 'vasculaire', 'brun', 'intérieur', 'tige', 'racine', 'fusarium'],
       severity: 'high',
-      description: 'Maladie vasculaire : le champignon bouche les vaisseaux conducteurs de la plante. La tige coupée montre un brunissement interne caractéristique.',
+      description: 'Maladie vasculaire : le champignon bouche les vaisseaux conducteurs. La tige coupée montre un brunissement interne caractéristique.',
       treatments: [
         'Retirer et détruire les plantes atteintes — pas de compostage',
         'Désinfecter les outils entre chaque plant',
@@ -240,21 +205,17 @@
     },
   ];
 
-  // ── State ──────────────────────────────────────────────
-
-  const defaultState = () => ({
-    garden: [],
-    history: [],
-  });
+  // ── État ───────────────────────────────────────────────
 
   let state = loadState();
   let currentView = 'diagnostic';
+  let uploadedPhotos = [];
 
   function loadState() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      return raw ? { ...defaultState(), ...JSON.parse(raw) } : defaultState();
-    } catch { return defaultState(); }
+      return raw ? { garden: [], history: [], ...JSON.parse(raw) } : { garden: [], history: [] };
+    } catch { return { garden: [], history: [] }; }
   }
 
   function save() {
@@ -271,290 +232,443 @@
     );
   }
 
+  function fmtDate(s) {
+    if (!s) return '';
+    const d = new Date(s);
+    return isNaN(d) ? s : d.toLocaleDateString('fr-FR');
+  }
+
   function refreshIcons() {
     if (window.lucide) window.lucide.createIcons();
   }
 
-  // ── Routing ────────────────────────────────────────────
-
-  const VIEW_META = {
-    diagnostic: { title: 'Diagnostic' },
-    garden:     { title: 'Mon jardin' },
-    history:    { title: 'Historique des diagnostics' },
-    guide:      { title: 'Guide des maladies' },
-  };
+  // ── Navigation ─────────────────────────────────────────
 
   function setView(name) {
     currentView = name;
-    document.querySelectorAll('.nav-item').forEach(el =>
+    uploadedPhotos = [];
+    document.querySelectorAll('[data-view]').forEach(el =>
       el.classList.toggle('active', el.dataset.view === name)
     );
-    document.getElementById('page-title').textContent = VIEW_META[name]?.title || '';
-    closeSidebar();
     render();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  // ── Rendering ──────────────────────────────────────────
+  // ── Rendu principal ────────────────────────────────────
 
   function render() {
     const app = document.getElementById('app');
     app.innerHTML = '';
-    const tpl = document.getElementById(`tpl-${currentView}`);
-    if (!tpl) return;
-    app.appendChild(tpl.content.cloneNode(true));
-    ({ diagnostic: renderDiagnostic, garden: renderGarden, history: renderHistory, guide: renderGuide })[currentView]?.();
+    ({ diagnostic: renderDiagnostic, garden: renderGarden, guide: renderGuide, history: renderHistory })[currentView]?.(app);
     refreshIcons();
   }
 
-  // ── Diagnostic ─────────────────────────────────────────
+  // ── VUE DIAGNOSTIC ─────────────────────────────────────
 
-  function renderDiagnostic() {
-    const plantGrid = document.getElementById('plant-grid');
-    PLANTS.forEach(p => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'plant-btn';
-      btn.dataset.plant = p.id;
-      btn.innerHTML = `<span class="plant-emoji">${p.icon}</span><span>${esc(p.label)}</span>`;
-      btn.addEventListener('click', () => {
-        plantGrid.querySelectorAll('.plant-btn').forEach(b => b.classList.remove('selected'));
-        btn.classList.toggle('selected');
-      });
-      plantGrid.appendChild(btn);
+  function renderDiagnostic(container) {
+    const plantOptions = PLANTS
+      .map(p => `<option value="${p.id}">${p.icon} ${p.label}</option>`)
+      .join('');
+
+    container.innerHTML = `
+      <div class="view">
+
+        <!-- Hero -->
+        <div class="diag-hero">
+          <div class="hero-icon"><i data-lucide="leaf"></i></div>
+          <div class="hero-text">
+            <h1>Diagnostiquez vos plantes</h1>
+            <p>Décrivez vos symptômes et obtenez des conseils de traitement personnalisés</p>
+          </div>
+        </div>
+
+        <!-- Formulaire -->
+        <div class="form-card">
+
+          <!-- Étape 1 : Plante -->
+          <div class="form-step">
+            <div class="step-header">
+              <div class="step-num">1</div>
+              <div class="step-label"><i data-lucide="sprout"></i> Quelle est votre plante ?</div>
+            </div>
+            <div class="select-wrap">
+              <i data-lucide="sprout" class="select-leaf"></i>
+              <select id="plant-select" class="plant-select">
+                <option value="">— Choisissez votre plante —</option>
+                ${plantOptions}
+              </select>
+              <i data-lucide="chevron-down" class="select-arrow"></i>
+            </div>
+          </div>
+
+          <div class="step-divider"></div>
+
+          <!-- Étape 2 : Symptômes -->
+          <div class="form-step">
+            <div class="step-header">
+              <div class="step-num">2</div>
+              <div class="step-label"><i data-lucide="message-square"></i> Décrivez les symptômes observés</div>
+            </div>
+            <textarea id="symptom-text" class="symptom-textarea" rows="5"
+              placeholder="Ex : Les feuilles jaunissent à partir du bas, des taches brunes apparaissent sur les tiges, la plante se fane malgré l'arrosage, présence d'un duvet grisâtre sur les feuilles..."></textarea>
+          </div>
+
+          <div class="step-divider"></div>
+
+          <!-- Étape 3 : Photos -->
+          <div class="form-step">
+            <div class="step-header">
+              <div class="step-num">3</div>
+              <div class="step-label">
+                <i data-lucide="camera"></i> Photos de votre plante
+                <span class="opt">— optionnel</span>
+              </div>
+            </div>
+            <div class="upload-zone" id="upload-zone">
+              <i data-lucide="image-plus"></i>
+              <p>Glissez vos photos ici<br><span class="upload-or">ou</span></p>
+              <button type="button" class="btn-upload" id="upload-btn">
+                <i data-lucide="folder-open"></i> Choisir des photos
+              </button>
+              <span class="upload-hint">JPG, PNG · Maximum 5 photos</span>
+              <input type="file" id="photo-input" accept="image/*" multiple hidden />
+            </div>
+            <div id="photo-preview"></div>
+          </div>
+
+          <!-- Bouton -->
+          <button class="search-btn" id="search-btn">
+            <i data-lucide="search"></i>
+            <span>RECHERCHER</span>
+          </button>
+        </div>
+
+        <!-- Résultats (cachés au départ) -->
+        <div id="results-section" class="results-section" style="display:none"></div>
+
+      </div>
+    `;
+
+    initDiagnosticEvents();
+  }
+
+  function initDiagnosticEvents() {
+    const zone      = document.getElementById('upload-zone');
+    const input     = document.getElementById('photo-input');
+    const uploadBtn = document.getElementById('upload-btn');
+
+    uploadBtn?.addEventListener('click', e => { e.stopPropagation(); input.click(); });
+    zone?.addEventListener('click', () => input.click());
+
+    input?.addEventListener('change', e => {
+      handleFiles(Array.from(e.target.files));
+      input.value = '';
     });
 
-    const symptomGrid = document.getElementById('symptom-grid');
-    SYMPTOMS.forEach(s => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'symptom-btn';
-      btn.dataset.symptom = s.id;
-      btn.innerHTML = `<i data-lucide="${s.icon}"></i><span>${esc(s.label)}</span>`;
-      btn.addEventListener('click', () => btn.classList.toggle('selected'));
-      symptomGrid.appendChild(btn);
-    });
-
-    const partGroup = document.getElementById('part-group');
-    PARTS.forEach(p => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'tag-btn';
-      btn.dataset.part = p.id;
-      btn.textContent = p.label;
-      btn.addEventListener('click', () => btn.classList.toggle('selected'));
-      partGroup.appendChild(btn);
-    });
-
-    document.getElementById('diag-form').addEventListener('submit', e => {
+    zone?.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+    zone?.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+    zone?.addEventListener('drop', e => {
       e.preventDefault();
-      runDiagnostic();
+      zone.classList.remove('drag-over');
+      handleFiles(Array.from(e.dataTransfer.files));
     });
 
-    document.getElementById('diag-form').addEventListener('reset', () => {
-      setTimeout(() => {
-        document.querySelectorAll('.plant-btn, .symptom-btn, .tag-btn').forEach(b => b.classList.remove('selected'));
-        document.getElementById('diag-result').classList.add('hidden');
-        document.getElementById('diag-result').innerHTML = '';
-      }, 0);
-    });
+    document.getElementById('search-btn')?.addEventListener('click', runDiagnostic);
+  }
 
+  // ── Gestion des photos ─────────────────────────────────
+
+  function handleFiles(files) {
+    const images    = files.filter(f => f.type.startsWith('image/'));
+    const remaining = 5 - uploadedPhotos.length;
+    images.slice(0, remaining).forEach(file => {
+      const reader = new FileReader();
+      reader.onload = e => resizeImage(e.target.result, 500, dataUrl => {
+        uploadedPhotos.push({ name: file.name, dataUrl });
+        renderPhotoPreview();
+      });
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function resizeImage(src, maxSize, cb) {
+    const img = new Image();
+    img.onload = () => {
+      let w = img.width, h = img.height;
+      if (w > h) { if (w > maxSize) { h = Math.round(h * maxSize / w); w = maxSize; } }
+      else        { if (h > maxSize) { w = Math.round(w * maxSize / h); h = maxSize; } }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      cb(canvas.toDataURL('image/jpeg', 0.75));
+    };
+    img.src = src;
+  }
+
+  function renderPhotoPreview() {
+    const preview = document.getElementById('photo-preview');
+    if (!preview) return;
+    if (!uploadedPhotos.length) { preview.innerHTML = ''; return; }
+    preview.innerHTML = `<div class="photo-grid">
+      ${uploadedPhotos.map((p, i) => `
+        <div class="photo-thumb">
+          <img src="${p.dataUrl}" alt="${esc(p.name)}" />
+          <button class="photo-del" data-idx="${i}" aria-label="Supprimer"><i data-lucide="x"></i></button>
+        </div>`).join('')}
+    </div>`;
+    preview.querySelectorAll('.photo-del').forEach(btn =>
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        uploadedPhotos.splice(Number(btn.dataset.idx), 1);
+        renderPhotoPreview();
+      })
+    );
     refreshIcons();
   }
+
+  // ── Moteur de diagnostic ───────────────────────────────
 
   function runDiagnostic() {
-    const selectedPlant = document.querySelector('.plant-btn.selected')?.dataset.plant;
-    const customPlant   = document.getElementById('plant-custom').value.trim();
-    const selectedSymptoms = [...document.querySelectorAll('.symptom-btn.selected')].map(b => b.dataset.symptom);
-    const selectedParts    = [...document.querySelectorAll('.tag-btn.selected')].map(b => b.dataset.part);
-    const weather    = document.getElementById('weather').value;
-    const watering   = document.getElementById('watering').value;
-    const description = document.getElementById('description').value.trim();
+    const plantId = document.getElementById('plant-select')?.value;
+    const text    = document.getElementById('symptom-text')?.value.trim();
 
-    if (!selectedPlant && !customPlant) {
-      alert('Veuillez sélectionner ou préciser une plante.');
+    if (!plantId) {
+      document.getElementById('plant-select')?.classList.add('shake');
+      showNotice('Veuillez choisir une plante dans la liste.');
       return;
     }
-    if (selectedSymptoms.length === 0) {
-      alert('Veuillez sélectionner au moins un symptôme.');
+    if (!text || text.length < 5) {
+      document.getElementById('symptom-text')?.classList.add('shake');
+      showNotice('Veuillez décrire les symptômes observés.');
       return;
     }
 
-    const plantLabel = customPlant || PLANTS.find(p => p.id === selectedPlant)?.label || selectedPlant;
-    const results = scoreDiseases(selectedPlant, selectedSymptoms, weather, watering);
-    const entry = {
-      id: uid(),
-      date: new Date().toISOString(),
-      plant: plantLabel,
-      plantId: selectedPlant || 'other',
-      symptoms: selectedSymptoms,
-      parts: selectedParts,
-      weather, watering, description,
-      results: results.slice(0, 3).map(r => r.id),
-    };
-    state.history.unshift(entry);
-    save();
+    const btn = document.getElementById('search-btn');
+    btn.classList.add('loading');
+    btn.disabled = true;
 
-    displayResults(results, plantLabel, entry);
+    setTimeout(() => {
+      const plant   = PLANTS.find(p => p.id === plantId);
+      const results = scoreDiseases(plantId, text);
+
+      state.history.unshift({
+        id: uid(),
+        date: new Date().toISOString(),
+        plant: plant?.label || plantId,
+        plantIcon: plant?.icon || '🌱',
+        plantId,
+        text,
+        photos: uploadedPhotos.length,
+        results: results.slice(0, 3).map(r => r.id),
+      });
+      save();
+
+      btn.classList.remove('loading');
+      btn.disabled = false;
+      displayResults(results, plant);
+    }, 900);
   }
 
-  function scoreDiseases(plantId, symptoms, weather, watering) {
+  function scoreDiseases(plantId, text) {
+    const lower = text.toLowerCase();
     return DISEASES.map(disease => {
       let score = 0;
 
-      // symptom matches
-      const matchedSymptoms = symptoms.filter(s => disease.symptoms.includes(s));
-      score += matchedSymptoms.length * 10;
+      if (plantId && disease.plants.includes(plantId)) score += 22;
 
-      // bonus if most disease symptoms are matched
-      if (disease.symptoms.length > 0) {
-        score += Math.round((matchedSymptoms.length / disease.symptoms.length) * 20);
+      const matchCount = disease.keywords.filter(kw => lower.includes(kw)).length;
+      score += matchCount * 10;
+
+      if (disease.keywords.length > 0) {
+        score += Math.round((matchCount / disease.keywords.length) * 15);
       }
 
-      // plant match
-      if (plantId && disease.plants.includes(plantId)) score += 15;
-
-      // condition match
-      if (weather && disease.conditions.includes(weather)) score += 8;
-      if (watering === 'over' && disease.conditions.includes('over')) score += 8;
-
-      return { ...disease, score, matchedSymptoms };
+      return { ...disease, score, matchCount };
     })
-    .filter(d => d.score > 0)
+    .filter(d => d.score > 8)
     .sort((a, b) => b.score - a.score);
   }
 
-  function displayResults(results, plantLabel, entry) {
-    const el = document.getElementById('diag-result');
-    el.classList.remove('hidden');
+  function displayResults(results, plant) {
+    const section = document.getElementById('results-section');
+    section.style.display = 'flex';
 
     if (!results.length) {
-      el.innerHTML = `
+      section.innerHTML = `
         <div class="result-empty">
           <i data-lucide="help-circle"></i>
-          <p>Aucune maladie correspondante trouvée dans la base de données.<br>
+          <h3>Aucune maladie identifiée</h3>
+          <p>La description ne correspond pas à une maladie connue dans notre base.<br>
           Consultez un agronome ou votre coopérative agricole locale.</p>
         </div>`;
+      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
       refreshIcons();
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
       return;
     }
 
     const top = results.slice(0, 3);
-    el.innerHTML = `
-      <div class="result-header">
-        <i data-lucide="clipboard-list"></i>
+    section.innerHTML = `
+      <div class="result-header-card">
+        <div class="result-header-icon"><i data-lucide="clipboard-check"></i></div>
         <div>
-          <h3>Résultats pour <strong>${esc(plantLabel)}</strong></h3>
-          <p class="result-sub">${top.length} maladie(s) probable(s) identifiée(s)</p>
+          <h2>Résultat du diagnostic</h2>
+          <p>${top.length} maladie${top.length > 1 ? 's' : ''} identifiée${top.length > 1 ? 's' : ''}
+             pour <strong>${esc(plant?.label || '')}</strong></p>
+          ${uploadedPhotos.length
+            ? `<div class="photo-count-badge"><i data-lucide="camera"></i> ${uploadedPhotos.length} photo${uploadedPhotos.length > 1 ? 's' : ''} enregistrée${uploadedPhotos.length > 1 ? 's' : ''}</div>`
+            : ''}
         </div>
       </div>
-      ${top.map((d, i) => diseaseResultCard(d, i)).join('')}
-      <div class="save-banner">
-        <i data-lucide="check-circle"></i>
-        Diagnostic sauvegardé dans l'historique
+
+      ${top.map((d, i) => buildDiseaseCard(d, i, plant)).join('')}
+
+      <div class="result-footer">
+        <i data-lucide="info"></i>
+        Ce diagnostic est basé sur les symptômes décrits. Consultez un professionnel agréé en cas de doute.
       </div>
     `;
 
-    el.querySelectorAll('.result-save-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const plantId = entry.plantId;
-        openGardenForm(null, plantId, btn.dataset.diseaseId);
-      });
-    });
-
+    section.querySelectorAll('.add-to-garden-btn').forEach(btn =>
+      btn.addEventListener('click', () => openGardenModal(null, btn.dataset.plant, btn.dataset.disease))
+    );
+    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
     refreshIcons();
-    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  function severityLabel(s) {
-    return { high: { text: 'Élevé', cls: 'sev-high' }, medium: { text: 'Moyen', cls: 'sev-medium' }, low: { text: 'Faible', cls: 'sev-low' } }[s] || { text: s, cls: '' };
-  }
+  function buildDiseaseCard(d, rank, plant) {
+    const SEV = {
+      high:   { cls: 'sev-high', label: 'Risque élevé',  icon: 'alert-triangle' },
+      medium: { cls: 'sev-med',  label: 'Risque moyen',  icon: 'alert-circle'   },
+      low:    { cls: 'sev-low',  label: 'Risque faible', icon: 'info'           },
+    };
+    const sev        = SEV[d.severity] || SEV.low;
+    const confidence = Math.min(100, Math.round((d.score / 65) * 100));
+    const isTop      = rank === 0;
+    const suffix     = ['re', 'e', 'e'][rank] || 'e';
 
-  function diseaseResultCard(d, rank) {
-    const sev = severityLabel(d.severity);
-    const confidence = Math.min(100, Math.round((d.score / 60) * 100));
     return `
-      <div class="result-card ${rank === 0 ? 'result-top' : ''}">
-        <div class="result-card-header">
-          <div class="result-rank">${rank === 0 ? '1re hypothèse' : `${rank + 1}e hypothèse`}</div>
-          <span class="sev-badge ${sev.cls}">${sev.text} risque</span>
+      <div class="disease-card ${isTop ? 'disease-card-top' : ''} ${sev.cls}">
+        <div class="disease-card-header">
+          <div class="disease-rank-badge">${rank + 1}${suffix} hypothèse</div>
+          <div class="sev-badge ${sev.cls}">
+            <i data-lucide="${sev.icon}"></i> ${sev.label}
+          </div>
         </div>
-        <h4 class="disease-name">${esc(d.name)}</h4>
+
+        <h3 class="disease-title">${esc(d.name)}</h3>
         <p class="disease-pathogen"><i data-lucide="microscope"></i> ${esc(d.pathogen)}</p>
+
+        <div class="confidence-row">
+          <span class="confidence-lbl">Correspondance</span>
+          <div class="confidence-bar">
+            <div class="confidence-fill" style="width:${confidence}%"></div>
+          </div>
+          <span class="confidence-val">${confidence}%</span>
+        </div>
+
         <p class="disease-desc">${esc(d.description)}</p>
-        <div class="confidence-bar-wrap">
-          <span class="confidence-label">Correspondance</span>
-          <div class="confidence-bar"><div class="confidence-fill" style="width:${confidence}%"></div></div>
-          <span class="confidence-pct">${confidence}%</span>
+
+        <div class="disease-section">
+          <h4 class="section-title"><i data-lucide="pill"></i> Traitements recommandés</h4>
+          <ol class="treatment-list">
+            ${d.treatments.map(t => `<li>${esc(t)}</li>`).join('')}
+          </ol>
         </div>
-        <div class="result-section">
-          <h5><i data-lucide="shield-check"></i> Traitements recommandés</h5>
-          <ul>${d.treatments.map(t => `<li>${esc(t)}</li>`).join('')}</ul>
-        </div>
-        <div class="result-section">
-          <h5><i data-lucide="lock"></i> Prévention</h5>
+
+        <div class="disease-section prevention-box">
+          <h4 class="section-title"><i data-lucide="shield-check"></i> Prévention</h4>
           <p>${esc(d.prevention)}</p>
         </div>
-        <div class="result-actions">
-          <button class="btn-secondary result-save-btn" data-disease-id="${d.id}">
-            <i data-lucide="sprout"></i> Ajouter à Mon jardin
+
+        <div class="disease-card-footer">
+          <button class="add-to-garden-btn" data-plant="${plant?.id || ''}" data-disease="${d.id}">
+            <i data-lucide="plus-circle"></i> Ajouter à Mon Jardin
           </button>
         </div>
       </div>
     `;
   }
 
-  // ── Garden ─────────────────────────────────────────────
+  function showNotice(msg) {
+    const existing = document.querySelector('.notice');
+    if (existing) existing.remove();
+    const el = document.createElement('div');
+    el.className = 'notice';
+    el.innerHTML = `<i data-lucide="alert-circle"></i> ${msg}`;
+    const form = document.querySelector('.form-card');
+    if (form) form.before(el);
+    refreshIcons();
+    setTimeout(() => el.remove(), 3500);
+  }
 
-  function renderGarden() {
-    document.querySelector('[data-action="add"]').addEventListener('click', () => openGardenForm());
+  // ── VUE MON JARDIN ─────────────────────────────────────
+
+  function renderGarden(container) {
+    container.innerHTML = `
+      <div class="view">
+        <div class="view-header">
+          <div class="view-title"><i data-lucide="sprout"></i><h2>Mon Jardin</h2></div>
+          <button class="btn-primary" id="add-plant-btn"><i data-lucide="plus"></i> Ajouter une plante</button>
+        </div>
+        <div class="garden-grid" id="garden-grid"></div>
+      </div>
+    `;
+    renderGardenCards();
+    document.getElementById('add-plant-btn').addEventListener('click', () => openGardenModal());
+    refreshIcons();
+  }
+
+  function renderGardenCards() {
     const grid = document.getElementById('garden-grid');
+    if (!grid) return;
 
     if (!state.garden.length) {
-      grid.innerHTML = `<div class="empty-garden">
-        <i data-lucide="sprout"></i>
-        <p>Votre jardin est vide.<br>Ajoutez vos plantes pour les suivre dans le temps.</p>
-        <button class="btn-primary" id="add-first"><i data-lucide="plus"></i>Ajouter une plante</button>
-      </div>`;
-      document.getElementById('add-first').addEventListener('click', () => openGardenForm());
+      grid.innerHTML = `
+        <div class="empty-state">
+          <i data-lucide="sprout"></i>
+          <h3>Votre jardin est vide</h3>
+          <p>Ajoutez vos plantes pour les suivre dans le temps et noter les traitements appliqués.</p>
+          <button class="btn-primary" id="add-first"><i data-lucide="plus"></i> Ajouter une plante</button>
+        </div>`;
+      document.getElementById('add-first')?.addEventListener('click', () => openGardenModal());
       refreshIcons();
       return;
     }
 
     grid.innerHTML = state.garden.map(p => {
-      const plantMeta = PLANTS.find(pl => pl.id === p.plantId);
-      const disease   = DISEASES.find(d => d.id === p.diseaseId);
+      const meta    = PLANTS.find(pl => pl.id === p.plantId);
+      const disease = DISEASES.find(d => d.id === p.diseaseId);
       return `
-        <div class="garden-card" data-id="${p.id}">
+        <div class="garden-card">
           <div class="garden-card-top">
-            <span class="garden-emoji">${plantMeta?.icon || '🌱'}</span>
+            <span class="garden-emoji">${meta?.icon || '🌱'}</span>
             <div class="garden-info">
               <strong>${esc(p.name)}</strong>
-              <span class="garden-plant-label">${esc(plantMeta?.label || p.plantId)}</span>
+              <span>${esc(meta?.label || p.plantId)}</span>
             </div>
-            <div class="garden-actions">
+            <div class="garden-card-actions">
               <button class="btn-icon" data-edit="${p.id}"><i data-lucide="pencil"></i></button>
               <button class="btn-icon danger" data-del="${p.id}"><i data-lucide="trash-2"></i></button>
             </div>
           </div>
-          ${disease ? `<div class="garden-disease-tag"><i data-lucide="alert-triangle"></i>${esc(disease.name)}</div>` : ''}
+          ${disease ? `<div class="disease-chip"><i data-lucide="alert-triangle"></i>${esc(disease.name)}</div>` : ''}
           ${p.notes ? `<p class="garden-notes">${esc(p.notes)}</p>` : ''}
           <div class="garden-meta">
             <span class="status-chip status-${p.status}">${statusLabel(p.status)}</span>
-            ${p.addedDate ? `<span class="garden-date">Depuis le ${fmtDate(p.addedDate)}</span>` : ''}
+            ${p.since ? `<span class="garden-date">Depuis le ${fmtDate(p.since)}</span>` : ''}
           </div>
-        </div>
-      `;
+        </div>`;
     }).join('');
 
     grid.querySelectorAll('[data-edit]').forEach(b =>
-      b.addEventListener('click', () => openGardenForm(b.dataset.edit)));
+      b.addEventListener('click', () => openGardenModal(b.dataset.edit)));
     grid.querySelectorAll('[data-del]').forEach(b =>
       b.addEventListener('click', () => {
-        if (confirm('Supprimer cette plante du jardin ?')) {
-          state.garden = state.garden.filter(p => p.id !== b.dataset.del);
-          save(); render();
-        }
+        if (!confirm('Supprimer cette plante du jardin ?')) return;
+        state.garden = state.garden.filter(p => p.id !== b.dataset.del);
+        save();
+        renderGardenCards();
+        refreshIcons();
       }));
     refreshIcons();
   }
@@ -563,181 +677,186 @@
     return { healthy: 'Sain', sick: 'Malade', treated: 'En traitement', recovered: 'Rétabli' }[s] || s;
   }
 
-  function fmtDate(s) {
-    if (!s) return '';
-    const d = new Date(s);
-    return isNaN(d) ? s : d.toLocaleDateString('fr-FR');
-  }
-
-  function openGardenForm(id, defaultPlantId, defaultDiseaseId) {
-    const editing = id ? state.garden.find(p => p.id === id) : null;
-    const plantOptions = PLANTS.map(p => ({ value: p.id, label: `${p.icon} ${p.label}` }));
-    const diseaseOptions = DISEASES.map(d => ({ value: d.id, label: d.name }));
+  function openGardenModal(id, defaultPlantId, defaultDiseaseId) {
+    const editing  = id ? state.garden.find(p => p.id === id) : null;
+    const plantOpts = PLANTS.map(p => ({ value: p.id, label: `${p.icon} ${p.label}` }));
+    const diseaseOpts = DISEASES.map(d => ({ value: d.id, label: d.name }));
+    const statusOpts = [
+      { value: 'sick',      label: 'Malade' },
+      { value: 'treated',   label: 'En traitement' },
+      { value: 'healthy',   label: 'Sain' },
+      { value: 'recovered', label: 'Rétabli' },
+    ];
 
     openModal(editing ? 'Modifier la plante' : 'Ajouter une plante', [
-      { name: 'name', label: 'Nom / surnom', required: true, placeholder: 'Ex: Tomates du potager' },
-      { name: 'plantId', label: 'Espèce', type: 'select', required: true,
-        options: plantOptions, default: defaultPlantId || '' },
-      { name: 'diseaseId', label: 'Maladie suspectée', type: 'select',
-        options: diseaseOptions, default: defaultDiseaseId || '' },
-      { name: 'status', label: 'État', type: 'select', required: true,
-        options: [
-          { value: 'healthy',   label: 'Sain' },
-          { value: 'sick',      label: 'Malade' },
-          { value: 'treated',   label: 'En traitement' },
-          { value: 'recovered', label: 'Rétabli' },
-        ], default: editing?.status || 'sick' },
-      { name: 'addedDate', label: 'Date d\'ajout', type: 'date', default: editing?.addedDate || new Date().toISOString().slice(0, 10) },
-      { name: 'notes', label: 'Notes', type: 'textarea' },
-    ], editing || {}, data => {
+      { name: 'name',      label: 'Nom / surnom *', required: true, default: editing?.name || '' },
+      { name: 'plantId',   label: 'Espèce *', type: 'select', required: true, options: plantOpts,    default: editing?.plantId   || defaultPlantId   || '' },
+      { name: 'diseaseId', label: 'Maladie suspectée', type: 'select', options: diseaseOpts,         default: editing?.diseaseId || defaultDiseaseId || '' },
+      { name: 'status',    label: 'État *', type: 'select', required: true, options: statusOpts,     default: editing?.status    || 'sick' },
+      { name: 'since',     label: 'Depuis le', type: 'date',                                         default: editing?.since || new Date().toISOString().slice(0, 10) },
+      { name: 'notes',     label: 'Notes', type: 'textarea', default: editing?.notes || '' },
+    ], data => {
       if (editing) Object.assign(editing, data);
       else state.garden.push({ id: uid(), ...data });
       save();
-      if (currentView === 'garden') render();
+      if (currentView === 'garden') renderGardenCards();
     });
   }
 
-  // ── History ────────────────────────────────────────────
+  // ── VUE GUIDE ──────────────────────────────────────────
 
-  function renderHistory() {
-    document.getElementById('clear-history').addEventListener('click', () => {
-      if (confirm('Effacer tout l\'historique ?')) {
-        state.history = [];
-        save(); render();
-      }
-    });
-
-    const list = document.getElementById('history-list');
-    if (!state.history.length) {
-      list.innerHTML = `<div class="empty-garden"><i data-lucide="history"></i><p>Aucun diagnostic encore réalisé.</p></div>`;
-      refreshIcons();
-      return;
-    }
-
-    list.innerHTML = state.history.map(entry => {
-      const symptomLabels = entry.symptoms.map(id => SYMPTOMS.find(s => s.id === id)?.label || id);
-      const diseaseNames  = entry.results.map(id => DISEASES.find(d => d.id === id)?.name || id);
-      return `
-        <div class="history-card">
-          <div class="history-card-header">
-            <span class="history-plant">${esc(entry.plant)}</span>
-            <span class="history-date">${fmtDate(entry.date)}</span>
-          </div>
-          <div class="history-symptoms">
-            ${symptomLabels.map(l => `<span class="symptom-tag">${esc(l)}</span>`).join('')}
-          </div>
-          ${diseaseNames.length ? `
-            <div class="history-results">
-              <strong>Hypothèses :</strong>
-              ${diseaseNames.map(n => `<span class="disease-tag">${esc(n)}</span>`).join('')}
-            </div>` : ''}
-          ${entry.description ? `<p class="history-desc">"${esc(entry.description)}"</p>` : ''}
-          <button class="btn-icon danger del-history" data-id="${entry.id}">
-            <i data-lucide="trash-2"></i> Supprimer
-          </button>
+  function renderGuide(container) {
+    container.innerHTML = `
+      <div class="view-wide">
+        <div class="view-header">
+          <div class="view-title"><i data-lucide="book-open"></i><h2>Guide des maladies</h2></div>
         </div>
-      `;
-    }).join('');
+        <div class="guide-search">
+          <i data-lucide="search" class="guide-search-icon"></i>
+          <input class="guide-search-input" id="guide-input" placeholder="Rechercher une maladie, une plante…" />
+        </div>
+        <div class="guide-grid" id="guide-grid"></div>
+      </div>
+    `;
 
-    list.querySelectorAll('.del-history').forEach(b =>
-      b.addEventListener('click', () => {
-        state.history = state.history.filter(e => e.id !== b.dataset.id);
-        save(); render();
-      }));
-    refreshIcons();
-  }
-
-  // ── Guide ──────────────────────────────────────────────
-
-  function renderGuide() {
-    const container = document.getElementById('disease-list');
-    const search    = document.getElementById('guide-search');
-
-    function displayDiseases(filter) {
-      const term = filter.toLowerCase();
+    const displayDiseases = term => {
+      const q = term.toLowerCase();
       const filtered = DISEASES.filter(d =>
-        !term ||
-        d.name.toLowerCase().includes(term) ||
-        d.pathogen.toLowerCase().includes(term) ||
-        d.plants.some(pid => (PLANTS.find(p => p.id === pid)?.label || '').toLowerCase().includes(term))
+        !q || d.name.toLowerCase().includes(q) || d.pathogen.toLowerCase().includes(q) ||
+        d.plants.some(pid => PLANTS.find(p => p.id === pid)?.label.toLowerCase().includes(q))
       );
-
+      const grid = document.getElementById('guide-grid');
       if (!filtered.length) {
-        container.innerHTML = `<div class="empty-garden"><i data-lucide="search-x"></i><p>Aucun résultat.</p></div>`;
+        grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><i data-lucide="search-x"></i><p>Aucun résultat.</p></div>`;
         refreshIcons();
         return;
       }
-
-      container.innerHTML = filtered.map(d => {
-        const sev = severityLabel(d.severity);
+      const SEV = { high: { cls: 'sev-high', label: 'Risque élevé' }, medium: { cls: 'sev-med', label: 'Risque moyen' }, low: { cls: 'sev-low', label: 'Risque faible' } };
+      grid.innerHTML = filtered.map(d => {
+        const sev = SEV[d.severity] || SEV.low;
         const plantLabels = d.plants.map(pid => PLANTS.find(p => p.id === pid)?.label || pid);
         return `
           <div class="guide-card">
             <div class="guide-card-header">
               <h3>${esc(d.name)}</h3>
-              <span class="sev-badge ${sev.cls}">${sev.text}</span>
+              <span class="sev-badge ${sev.cls}">${sev.label}</span>
             </div>
             <p class="guide-pathogen"><i data-lucide="microscope"></i> ${esc(d.pathogen)}</p>
             <p class="guide-desc">${esc(d.description)}</p>
-            <div class="guide-plants">
-              ${plantLabels.map(l => `<span class="plant-chip">${esc(l)}</span>`).join('')}
-            </div>
+            <div class="plant-chips">${plantLabels.map(l => `<span class="plant-chip">${esc(l)}</span>`).join('')}</div>
             <details class="guide-details">
-              <summary>Traitements & prévention</summary>
+              <summary>Traitements &amp; prévention</summary>
               <ul>${d.treatments.map(t => `<li>${esc(t)}</li>`).join('')}</ul>
               <p class="prevention-note"><strong>Prévention :</strong> ${esc(d.prevention)}</p>
             </details>
-          </div>
-        `;
+          </div>`;
       }).join('');
       refreshIcons();
-    }
+    };
 
+    refreshIcons();
     displayDiseases('');
-    search.addEventListener('input', () => displayDiseases(search.value));
+    document.getElementById('guide-input')?.addEventListener('input', e => displayDiseases(e.target.value));
   }
 
-  // ── Modal ──────────────────────────────────────────────
+  // ── VUE HISTORIQUE ─────────────────────────────────────
+
+  function renderHistory(container) {
+    container.innerHTML = `
+      <div class="view">
+        <div class="view-header">
+          <div class="view-title"><i data-lucide="clock"></i><h2>Historique</h2></div>
+          <button class="btn-danger" id="clear-all"><i data-lucide="trash-2"></i> Tout effacer</button>
+        </div>
+        <div class="history-list" id="history-list"></div>
+      </div>
+    `;
+
+    document.getElementById('clear-all')?.addEventListener('click', () => {
+      if (!confirm('Effacer tout l\'historique ?')) return;
+      state.history = [];
+      save();
+      renderHistoryList();
+    });
+
+    renderHistoryList();
+    refreshIcons();
+  }
+
+  function renderHistoryList() {
+    const list = document.getElementById('history-list');
+    if (!list) return;
+    if (!state.history.length) {
+      list.innerHTML = `<div class="empty-state"><i data-lucide="clock"></i><h3>Aucun diagnostic</h3><p>Vos diagnostics apparaîtront ici après votre première recherche.</p></div>`;
+      refreshIcons();
+      return;
+    }
+    list.innerHTML = state.history.map(e => {
+      const diseaseNames = e.results?.map(id => DISEASES.find(d => d.id === id)?.name || id) || [];
+      return `
+        <div class="history-card">
+          <div class="history-card-top">
+            <div class="history-plant-label">
+              <span class="history-plant-emoji">${e.plantIcon || '🌱'}</span>
+              ${esc(e.plant)}
+            </div>
+            <span class="history-date">${fmtDate(e.date)}</span>
+          </div>
+          ${e.text ? `<p class="history-symptom-text">"${esc(e.text.slice(0, 120))}${e.text.length > 120 ? '…' : ''}"</p>` : ''}
+          ${diseaseNames.length ? `<div class="history-results"><strong>Hypothèses :</strong>${diseaseNames.map(n => `<span class="disease-tag">${esc(n)}</span>`).join('')}</div>` : ''}
+          ${e.photos ? `<div class="photos-badge"><i data-lucide="camera"></i>${e.photos} photo${e.photos > 1 ? 's' : ''}</div>` : ''}
+          <button class="btn-del-history" data-id="${e.id}"><i data-lucide="trash-2"></i> Supprimer</button>
+        </div>`;
+    }).join('');
+    list.querySelectorAll('.btn-del-history').forEach(b =>
+      b.addEventListener('click', () => {
+        state.history = state.history.filter(e => e.id !== b.dataset.id);
+        save();
+        renderHistoryList();
+        refreshIcons();
+      })
+    );
+    refreshIcons();
+  }
+
+  // ── Modal générique ────────────────────────────────────
 
   const modal      = document.getElementById('modal');
   const modalTitle = document.getElementById('modal-title');
   const modalForm  = document.getElementById('modal-form');
 
-  document.getElementById('modal-close').addEventListener('click', closeModal);
-  modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+  document.getElementById('modal-close')?.addEventListener('click', closeModal);
+  modal?.addEventListener('click', e => { if (e.target === modal) closeModal(); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && !modal.hidden) closeModal(); });
 
-  function openModal(title, fields, initial, onSubmit) {
+  function openModal(title, fields, onSubmit) {
     modalTitle.textContent = title;
     modalForm.innerHTML = '';
-    const data = { ...initial };
 
     fields.forEach(f => {
       const wrap = document.createElement('div');
-      wrap.className = 'field';
-      const id = `mf-${f.name}`;
-      wrap.innerHTML = `<label for="${id}">${f.label}${f.required ? ' *' : ''}</label>`;
+      wrap.className = 'modal-field';
+      wrap.innerHTML = `<label for="mf-${f.name}">${f.label}</label>`;
       let el;
 
       if (f.type === 'select') {
         el = document.createElement('select');
-        el.id = id; el.name = f.name;
+        el.id = `mf-${f.name}`; el.name = f.name;
         if (!f.required) el.appendChild(new Option('— aucun —', ''));
-        f.options.forEach(o => {
+        (f.options || []).forEach(o => {
           const opt = new Option(o.label, o.value);
-          if (String(data[f.name] ?? f.default ?? '') === String(o.value)) opt.selected = true;
+          if (String(f.default ?? '') === String(o.value)) opt.selected = true;
           el.appendChild(opt);
         });
       } else if (f.type === 'textarea') {
         el = document.createElement('textarea');
-        el.id = id; el.name = f.name;
-        el.value = data[f.name] ?? f.default ?? '';
+        el.id = `mf-${f.name}`; el.name = f.name;
+        el.value = f.default ?? '';
       } else {
         el = document.createElement('input');
-        el.id = id; el.name = f.name;
+        el.id = `mf-${f.name}`; el.name = f.name;
         el.type = f.type || 'text';
-        el.value = data[f.name] ?? f.default ?? '';
-        if (f.placeholder) el.placeholder = f.placeholder;
+        el.value = f.default ?? '';
       }
       if (f.required) el.required = true;
       wrap.appendChild(el);
@@ -746,19 +865,17 @@
 
     const actions = document.createElement('div');
     actions.className = 'modal-actions';
-    actions.innerHTML = `<button type="button" class="btn-secondary" id="cancel-btn">Annuler</button>
-      <button type="submit" class="btn-primary"><i data-lucide="save"></i>Enregistrer</button>`;
+    actions.innerHTML = `
+      <button type="button" class="btn-secondary" id="cancel-modal">Annuler</button>
+      <button type="submit" class="btn-primary"><i data-lucide="save"></i> Enregistrer</button>`;
     modalForm.appendChild(actions);
-    modalForm.querySelector('#cancel-btn').addEventListener('click', closeModal);
+    document.getElementById('cancel-modal')?.addEventListener('click', closeModal);
 
     modalForm.onsubmit = e => {
       e.preventDefault();
-      const result = {};
-      fields.forEach(f => {
-        const el = modalForm.elements[f.name];
-        if (el) result[f.name] = el.value;
-      });
-      onSubmit(result);
+      const data = {};
+      fields.forEach(f => { const el = modalForm.elements[f.name]; if (el) data[f.name] = el.value; });
+      onSubmit(data);
       closeModal();
     };
 
@@ -772,60 +889,37 @@
     modalForm.innerHTML = '';
   }
 
-  // ── Sidebar (mobile) ───────────────────────────────────
-
-  const sidebar = document.getElementById('sidebar');
-  const overlay = document.getElementById('overlay');
-
-  document.getElementById('menu-toggle').addEventListener('click', () => {
-    sidebar.classList.add('open');
-    overlay.classList.add('open');
-  });
-  overlay.addEventListener('click', closeSidebar);
-
-  function closeSidebar() {
-    sidebar.classList.remove('open');
-    overlay.classList.remove('open');
-  }
-
   // ── Import / Export ────────────────────────────────────
 
-  document.getElementById('export-btn').addEventListener('click', () => {
+  document.getElementById('export-btn')?.addEventListener('click', () => {
     const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
     const url  = URL.createObjectURL(blob);
-    const a = Object.assign(document.createElement('a'), {
+    Object.assign(document.createElement('a'), {
       href: url, download: `agroassistant-${new Date().toISOString().slice(0, 10)}.json`,
-    });
-    a.click();
+    }).click();
     URL.revokeObjectURL(url);
   });
 
-  document.getElementById('import-btn').addEventListener('click', () =>
-    document.getElementById('import-file').click()
-  );
-
-  document.getElementById('import-file').addEventListener('change', e => {
+  document.getElementById('import-file')?.addEventListener('change', e => {
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
     reader.onload = () => {
       try {
         const parsed = JSON.parse(reader.result);
-        if (!confirm('Remplacer les données actuelles par celles du fichier ?')) return;
-        state = { ...defaultState(), ...parsed };
+        if (!confirm('Remplacer les données actuelles ?')) return;
+        state = { garden: [], history: [], ...parsed };
         save(); render();
-      } catch (err) {
-        alert('Fichier invalide : ' + err.message);
-      }
+      } catch (err) { alert('Fichier invalide : ' + err.message); }
     };
     reader.readAsText(file);
     e.target.value = '';
   });
 
-  // ── Navigation init ────────────────────────────────────
+  // ── Init ───────────────────────────────────────────────
 
-  document.querySelectorAll('.nav-item').forEach(b =>
-    b.addEventListener('click', () => setView(b.dataset.view))
+  document.querySelectorAll('[data-view]').forEach(btn =>
+    btn.addEventListener('click', () => setView(btn.dataset.view))
   );
 
   setView('diagnostic');
