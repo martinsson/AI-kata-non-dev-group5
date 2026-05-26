@@ -1,3 +1,82 @@
 <!doctype html>
-<title>Hello</title>
-<h1>Hello, world!</h1>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AgroAssistant — Diagnostic végétal</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- ── En-tête ────────────────────────────────────────── -->
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-logo">
+        <i data-lucide="leaf"></i>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">AgroAssistant</span>
+        <span class="brand-tag">Diagnostic végétal</span>
+      </div>
+    </div>
+    <nav class="desktop-nav" id="desktop-nav">
+      <button class="nav-btn" data-view="diagnostic">
+        <i data-lucide="stethoscope"></i><span>Diagnostic</span>
+      </button>
+      <button class="nav-btn" data-view="garden">
+        <i data-lucide="sprout"></i><span>Mon Jardin</span>
+      </button>
+      <button class="nav-btn" data-view="guide">
+        <i data-lucide="book-open"></i><span>Guide</span>
+      </button>
+      <button class="nav-btn" data-view="history">
+        <i data-lucide="clock"></i><span>Historique</span>
+      </button>
+    </nav>
+    <div class="header-actions">
+      <button class="btn-icon-sm" id="export-btn" title="Exporter">
+        <i data-lucide="download"></i>
+      </button>
+      <label class="btn-icon-sm" title="Importer">
+        <i data-lucide="upload"></i>
+        <input type="file" id="import-file" accept="application/json" hidden />
+      </label>
+    </div>
+  </header>
+
+  <!-- ── Contenu principal ──────────────────────────────── -->
+  <main id="app" class="app-main"></main>
+
+  <!-- ── Navigation mobile ─────────────────────────────── -->
+  <nav class="mobile-nav">
+    <button class="mob-btn" data-view="diagnostic">
+      <i data-lucide="stethoscope"></i><span>Diagnostic</span>
+    </button>
+    <button class="mob-btn" data-view="garden">
+      <i data-lucide="sprout"></i><span>Jardin</span>
+    </button>
+    <button class="mob-btn" data-view="guide">
+      <i data-lucide="book-open"></i><span>Guide</span>
+    </button>
+    <button class="mob-btn" data-view="history">
+      <i data-lucide="clock"></i><span>Historique</span>
+    </button>
+  </nav>
+
+  <!-- ── Modal ──────────────────────────────────────────── -->
+  <div id="modal" class="modal" hidden>
+    <div class="modal-card">
+      <header class="modal-header">
+        <h3 id="modal-title"></h3>
+        <button class="btn-icon" id="modal-close" aria-label="Fermer">
+          <i data-lucide="x"></i>
+        </button>
+      </header>
+      <form id="modal-form"></form>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
