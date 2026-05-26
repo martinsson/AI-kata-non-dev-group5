@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="fr">
+<html lang="fr" dir="ltr">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -20,19 +20,28 @@
       </div>
     </div>
     <nav class="desktop-nav" id="desktop-nav">
-      <button class="nav-btn" data-view="diagnostic">
+      <button class="nav-btn" data-view="diagnostic" data-i18n="nav.diagnostic">
         <i data-lucide="stethoscope"></i><span>Diagnostic</span>
       </button>
-      <button class="nav-btn" data-view="garden">
+      <button class="nav-btn" data-view="garden" data-i18n="nav.garden">
         <i data-lucide="sprout"></i><span>Mon Jardin</span>
       </button>
-      <button class="nav-btn" data-view="guide">
+      <button class="nav-btn" data-view="guide" data-i18n="nav.guide">
         <i data-lucide="book-open"></i><span>Guide</span>
       </button>
-      <button class="nav-btn" data-view="history">
+      <button class="nav-btn" data-view="history" data-i18n="nav.history">
         <i data-lucide="clock"></i><span>Historique</span>
       </button>
     </nav>
+
+    <div class="lang-switcher">
+      <button class="lang-btn active" data-lang="fr" title="Français">🇫🇷</button>
+      <button class="lang-btn" data-lang="en" title="English">🇬🇧</button>
+      <button class="lang-btn" data-lang="zh" title="中文">🇨🇳</button>
+      <button class="lang-btn" data-lang="es" title="Español">🇪🇸</button>
+      <button class="lang-btn" data-lang="ar" title="العربية">🇸🇦</button>
+    </div>
+
     <div class="header-actions">
       <button class="btn-icon-sm" id="export-btn" title="Exporter">
         <i data-lucide="download"></i>
@@ -49,16 +58,16 @@
 
   <!-- ── Navigation mobile ─────────────────────────────── -->
   <nav class="mobile-nav">
-    <button class="mob-btn" data-view="diagnostic">
+    <button class="mob-btn" data-view="diagnostic" data-i18n="nav.diagnostic">
       <i data-lucide="stethoscope"></i><span>Diagnostic</span>
     </button>
-    <button class="mob-btn" data-view="garden">
+    <button class="mob-btn" data-view="garden" data-i18n="nav.garden">
       <i data-lucide="sprout"></i><span>Jardin</span>
     </button>
-    <button class="mob-btn" data-view="guide">
+    <button class="mob-btn" data-view="guide" data-i18n="nav.guide">
       <i data-lucide="book-open"></i><span>Guide</span>
     </button>
-    <button class="mob-btn" data-view="history">
+    <button class="mob-btn" data-view="history" data-i18n="nav.history">
       <i data-lucide="clock"></i><span>Historique</span>
     </button>
   </nav>

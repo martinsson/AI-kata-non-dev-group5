@@ -1249,12 +1249,99 @@ a { text-decoration: none; color: inherit; }
   40%, 80%  { transform: translateX(5px); }
 }
 
+/* ── Language switcher ───────────────────────────────── */
+.lang-switcher {
+  display: flex;
+  align-items: center;
+  gap: .15rem;
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 8px;
+  padding: .2rem .25rem;
+  flex-shrink: 0;
+}
+.lang-btn {
+  width: 28px; height: 24px;
+  border: none;
+  border-radius: 5px;
+  background: transparent;
+  font-size: 1.1rem;
+  cursor: pointer;
+  opacity: .55;
+  transition: opacity .15s, background .15s;
+  padding: 0;
+  display: flex; align-items: center; justify-content: center;
+  line-height: 1;
+}
+.lang-btn:hover { opacity: .85; background: rgba(255,255,255,.1); }
+.lang-btn.active {
+  opacity: 1;
+  background: rgba(255,255,255,.18);
+  box-shadow: 0 0 0 1.5px rgba(255,255,255,.3);
+}
+
+/* ── RTL (Arabic) ────────────────────────────────────── */
+[dir="rtl"] .app-header { flex-direction: row-reverse; }
+[dir="rtl"] .desktop-nav { flex-direction: row-reverse; }
+[dir="rtl"] .brand { flex-direction: row-reverse; }
+[dir="rtl"] .nav-btn { flex-direction: row-reverse; }
+[dir="rtl"] .mob-btn span { direction: rtl; }
+
+[dir="rtl"] .form-step,
+[dir="rtl"] .step-header,
+[dir="rtl"] .step-label { flex-direction: row-reverse; }
+
+[dir="rtl"] .select-leaf { left: auto; right: 14px; }
+[dir="rtl"] .select-arrow { right: auto; left: 14px; }
+[dir="rtl"] .plant-select { padding: .75rem 2.75rem .75rem 2.5rem; text-align: right; }
+[dir="rtl"] .symptom-textarea { text-align: right; }
+[dir="rtl"] .upload-zone { direction: rtl; }
+
+[dir="rtl"] .result-header-card { flex-direction: row-reverse; }
+[dir="rtl"] .disease-card-header { flex-direction: row-reverse; }
+[dir="rtl"] .disease-pathogen { flex-direction: row-reverse; }
+[dir="rtl"] .confidence-row { flex-direction: row-reverse; }
+[dir="rtl"] .section-title { flex-direction: row-reverse; }
+[dir="rtl"] .treatment-list { padding-right: 1.4rem; padding-left: 0; }
+[dir="rtl"] .result-footer { flex-direction: row-reverse; }
+[dir="rtl"] .result-header-card { text-align: right; }
+[dir="rtl"] .disease-card { text-align: right; }
+
+[dir="rtl"] .view-header { flex-direction: row-reverse; }
+[dir="rtl"] .view-title { flex-direction: row-reverse; }
+[dir="rtl"] .garden-card-top { flex-direction: row-reverse; }
+[dir="rtl"] .garden-info { text-align: right; }
+[dir="rtl"] .garden-meta { flex-direction: row-reverse; }
+[dir="rtl"] .garden-card-actions { margin-left: 0; margin-right: auto; }
+
+[dir="rtl"] .history-card-top { flex-direction: row-reverse; }
+[dir="rtl"] .history-plant-label { flex-direction: row-reverse; }
+[dir="rtl"] .history-symptom-text { border-left: none; border-right: 3px solid var(--g200); }
+[dir="rtl"] .history-results { flex-direction: row-reverse; }
+
+[dir="rtl"] .guide-card-header { flex-direction: row-reverse; }
+[dir="rtl"] .guide-pathogen { flex-direction: row-reverse; }
+[dir="rtl"] .guide-details ul { padding-right: 1.2rem; padding-left: 0; }
+[dir="rtl"] .guide-details summary { flex-direction: row-reverse; }
+[dir="rtl"] .modal-header { flex-direction: row-reverse; }
+[dir="rtl"] .modal-actions { flex-direction: row-reverse; }
+[dir="rtl"] .modal-field { text-align: right; }
+[dir="rtl"] .modal-field input,
+[dir="rtl"] .modal-field select,
+[dir="rtl"] .modal-field textarea { text-align: right; direction: rtl; }
+
+[dir="rtl"] .notice { flex-direction: row-reverse; }
+[dir="rtl"] .lang-switcher { margin-left: 0; }
+[dir="rtl"] .header-actions { margin-left: 0; margin-right: auto; }
+
 /* ── Responsive ──────────────────────────────────────── */
 @media (max-width: 768px) {
   body { padding-bottom: var(--mobile-nav-h); }
   .mobile-nav { display: flex; }
   .desktop-nav { display: none; }
   .header-actions { display: none; }
+  .lang-switcher { gap: .1rem; padding: .15rem .2rem; }
+  .lang-btn { width: 24px; height: 22px; font-size: 1rem; }
 
   .view, .view-wide { padding: 1.25rem 1rem; gap: 1.1rem; }
 
