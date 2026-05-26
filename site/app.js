@@ -626,7 +626,7 @@
   // ── État ───────────────────────────────────────────────
 
   let state      = loadState();
-  let currentLang = localStorage.getItem(LANG_KEY) || 'fr';
+  let currentLang; try { currentLang = localStorage.getItem(LANG_KEY) || 'fr'; } catch { currentLang = 'fr'; }
   let currentView = 'diagnostic';
   let uploadedPhotos = [];
 
@@ -636,7 +636,7 @@
       return raw ? { garden: [], history: [], ...JSON.parse(raw) } : { garden: [], history: [] };
     } catch { return { garden: [], history: [] }; }
   }
-  function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+  function save() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch {} }
   function uid()  { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
   function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
   function fmtDate(s) { if (!s) return ''; const d = new Date(s); return isNaN(d) ? s : d.toLocaleDateString(currentLang === 'ar' ? 'ar-SA' : currentLang === 'zh' ? 'zh-CN' : currentLang === 'es' ? 'es-ES' : currentLang === 'en' ? 'en-GB' : 'fr-FR'); }
@@ -661,9 +661,20 @@
 
   // ── Changement de langue ───────────────────────────────
 
+  const LANG_LABELS = { fr: '🇫🇷 Français', en: '🇬🇧 English', zh: '🇨🇳 中文', es: '🇪🇸 Español', ar: '🇸🇦 العربية' };
+
+  function showLangToast(lang) {
+    const toast = document.getElementById('lang-toast');
+    if (!toast) return;
+    toast.textContent = LANG_LABELS[lang] || lang;
+    toast.classList.add('show');
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => toast.classList.remove('show'), 1800);
+  }
+
   function setLang(lang) {
     currentLang = lang;
-    localStorage.setItem(LANG_KEY, lang);
+    try { localStorage.setItem(LANG_KEY, lang); } catch {}
     document.documentElement.lang = lang;
     document.documentElement.dir  = lang === 'ar' ? 'rtl' : 'ltr';
     document.querySelectorAll('.lang-btn').forEach(b =>
@@ -671,6 +682,7 @@
     );
     applyNavTranslations();
     render();
+    showLangToast(lang);
   }
 
   function applyNavTranslations() {

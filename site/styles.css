@@ -1280,6 +1280,30 @@ a { text-decoration: none; color: inherit; }
   box-shadow: 0 0 0 1.5px rgba(255,255,255,.3);
 }
 
+/* ── Toast notification ──────────────────────────────── */
+#lang-toast {
+  position: fixed;
+  top: calc(var(--header-h) + 10px);
+  left: 50%;
+  transform: translateX(-50%) translateY(-8px);
+  background: var(--g800);
+  color: #fff;
+  padding: .45rem 1.1rem;
+  border-radius: 20px;
+  font-size: .82rem;
+  font-weight: 500;
+  box-shadow: 0 4px 16px rgba(0,0,0,.25);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s, transform .25s;
+  z-index: 300;
+  white-space: nowrap;
+}
+#lang-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
 /* ── RTL (Arabic) ────────────────────────────────────── */
 [dir="rtl"] .app-header { flex-direction: row-reverse; }
 [dir="rtl"] .desktop-nav { flex-direction: row-reverse; }
