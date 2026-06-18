@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Food Recommendations · 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --text: #f4f3ff;
+      --muted: #a5a3c4;
+      --glass: rgba(28, 26, 54, 0.55);
+      --glass-border: rgba(255, 255, 255, 0.10);
+      --accent: #b388ff;
+      --accent-2: #5ee7ff;
+      --row-hover: rgba(255, 255, 255, 0.06);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Inter", system-ui, sans-serif;
+      color: var(--text);
+      background: #0a0818;
+      display: flex;
+      justify-content: center;
+      padding: 2rem 1rem 3rem;
+      overflow-x: hidden;
+    }
+    .mesh {
+      position: fixed; inset: -30%; z-index: -1;
+      background:
+        radial-gradient(40% 40% at 20% 25%, #6d28d9 0%, transparent 60%),
+        radial-gradient(35% 35% at 80% 20%, #0ea5e9 0%, transparent 60%),
+        radial-gradient(45% 45% at 70% 80%, #db2777 0%, transparent 60%),
+        radial-gradient(40% 40% at 25% 85%, #2dd4bf 0%, transparent 60%);
+      filter: blur(60px) saturate(140%);
+      opacity: 0.5;
+      animation: drift 22s ease-in-out infinite alternate;
+    }
+    @keyframes drift { 0%{transform:translate3d(0,0,0) scale(1);} 100%{transform:translate3d(2%,-3%,0) scale(1.12);} }
+
+    main { width: 100%; max-width: 540px; animation: rise .7s cubic-bezier(.2,.8,.2,1) both; }
+    @keyframes rise { from{opacity:0;transform:translateY(16px);} to{opacity:1;transform:translateY(0);} }
+
+    header { margin: 0 0 1.25rem; }
+    .eyebrow { font-size: .7rem; letter-spacing: .28em; text-transform: uppercase; color: var(--muted); margin: 0 0 .4rem; }
+    h1 {
+      font-family: "Space Grotesk", sans-serif; font-size: 1.85rem; font-weight: 700; margin: 0; letter-spacing: -.01em;
+      background: linear-gradient(92deg, var(--accent-2), var(--accent) 60%, #ff9ecf);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .nav { margin-top:.6rem; font-size:.8rem; }
+    .nav a { color: var(--accent-2); text-decoration: none; }
+    .nav a:hover { text-decoration: underline; }
+
+    .card {
+      border-radius: 22px; background: var(--glass); border: 1px solid var(--glass-border);
+      backdrop-filter: blur(22px) saturate(160%); -webkit-backdrop-filter: blur(22px) saturate(160%);
+      box-shadow: 0 24px 60px -20px rgba(0,0,0,.65), inset 0 1px 0 rgba(255,255,255,.08);
+      padding: 1.1rem; margin-bottom: 1.1rem;
+    }
+    .card h2 { font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 0 0 .9rem; font-weight: 600; }
+
+    .reco { display: flex; align-items: center; gap: .8rem; padding: .7rem; border-radius: 14px; transition: background .18s, transform .18s; }
+    .reco:hover { background: var(--row-hover); transform: translateX(2px); }
+    .reco .emoji { width: 2.4rem; height: 2.4rem; flex:none; display:grid; place-items:center; font-size:1.2rem; border-radius:12px; background: linear-gradient(145deg, rgba(179,136,255,.22), rgba(94,231,255,.12)); border:1px solid var(--glass-border); }
+    .reco .body { flex:1; min-width:0; }
+    .reco .name { font-weight:600; font-size:.98rem; }
+    .reco .why { font-size:.78rem; color: var(--muted); margin-top:.15rem; }
+    .reco .score { font-size:.72rem; font-weight:700; color: var(--accent-2); padding:.15rem .55rem; border-radius:999px; background: rgba(94,231,255,.12); border:1px solid rgba(94,231,255,.2); flex:none; }
+
+    .history { display:flex; flex-wrap:wrap; gap:.4rem; }
+    .chip { font-size:.78rem; padding:.3rem .6rem; border-radius:999px; background: rgba(255,255,255,.05); border:1px solid var(--glass-border); }
+    .chip b { color: var(--accent); font-weight:600; }
+
+    form { display:flex; gap:.5rem; margin-top:.9rem; }
+    select, button {
+      font-family: inherit; font-size:.85rem; color: var(--text); border-radius: 12px;
+      border:1px solid var(--glass-border); background: rgba(255,255,255,.05); padding:.55rem .7rem;
+    }
+    select { flex:1; }
+    button { cursor:pointer; font-weight:600; background: linear-gradient(145deg, rgba(179,136,255,.35), rgba(94,231,255,.25)); }
+    button:hover { filter: brightness(1.15); }
+    .reset { background: rgba(255,255,255,.05); }
+
+    footer { text-align:center; font-size:.72rem; color: var(--muted); margin-top:.4rem; }
+  </style>
+</head>
+<body>
+  <div class="mesh" aria-hidden="true"></div>
+  <main>
+    <header>
+      <p class="eyebrow">Personalized Engine</p>
+      <h1>Food Recommendations</h1>
+      <p class="nav"><a href="./index.html">← Project Tree</a></p>
+    </header>
+
+    <div class="card">
+      <h2>Recommended for you</h2>
+      <div id="recos"></div>
+    </div>
+
+    <div class="card">
+      <h2>Your order history</h2>
+      <div class="history" id="history"></div>
+      <form id="orderForm">
+        <select id="dishPicker"></select>
+        <button type="submit">+ Add order</button>
+        <button type="button" class="reset" id="resetBtn">Reset</button>
+      </form>
+    </div>
+
+    <footer>Recommendations update from cuisine affinity · frequency · recency</footer>
+  </main>
+
+  <script>
+    // ---- Dish catalog: each dish has a cuisine and category ----
+    const CATALOG = [
+      { id: "margherita",   name: "Margherita Pizza",   emoji: "🍕", cuisine: "Italian",  category: "main" },
+      { id: "carbonara",    name: "Spaghetti Carbonara", emoji: "🍝", cuisine: "Italian",  category: "main" },
+      { id: "lasagna",      name: "Lasagna",            emoji: "🍝", cuisine: "Italian",  category: "main" },
+      { id: "tiramisu",     name: "Tiramisu",           emoji: "🍰", cuisine: "Italian",  category: "dessert" },
+      { id: "sushi",        name: "Salmon Sushi Set",   emoji: "🍣", cuisine: "Japanese", category: "main" },
+      { id: "ramen",        name: "Tonkotsu Ramen",     emoji: "🍜", cuisine: "Japanese", category: "main" },
+      { id: "gyoza",        name: "Gyoza Dumplings",    emoji: "🥟", cuisine: "Japanese", category: "starter" },
+      { id: "padthai",      name: "Pad Thai",           emoji: "🍤", cuisine: "Thai",     category: "main" },
+      { id: "greencurry",   name: "Green Curry",        emoji: "🍛", cuisine: "Thai",     category: "main" },
+      { id: "tacos",        name: "Beef Tacos",         emoji: "🌮", cuisine: "Mexican",  category: "main" },
+      { id: "burrito",      name: "Chicken Burrito",    emoji: "🌯", cuisine: "Mexican",  category: "main" },
+      { id: "guacamole",    name: "Guacamole & Chips",  emoji: "🥑", cuisine: "Mexican",  category: "starter" },
+      { id: "burger",       name: "Classic Burger",     emoji: "🍔", cuisine: "American", category: "main" },
+      { id: "wings",        name: "Buffalo Wings",      emoji: "🍗", cuisine: "American", category: "starter" },
+      { id: "tikka",        name: "Chicken Tikka Masala", emoji: "🍛", cuisine: "Indian", category: "main" },
+      { id: "naan",         name: "Garlic Naan",        emoji: "🫓", cuisine: "Indian",   category: "starter" },
+      { id: "biryani",      name: "Veg Biryani",        emoji: "🍚", cuisine: "Indian",   category: "main" },
+    ];
+    const byId = Object.fromEntries(CATALOG.map(d => [d.id, d]));
+
+    // ---- Seed order history (most recent last) ----
+    const SEED = ["margherita","sushi","margherita","ramen","carbonara","sushi","gyoza","ramen"];
+    const KEY = "foodOrderHistory";
+
+    const loadHistory = () => JSON.parse(localStorage.getItem(KEY) || "null") || [...SEED];
+    const saveHistory = (h) => localStorage.setItem(KEY, JSON.stringify(h));
+
+    // ---- Recommendation engine ----
+    function recommend(history) {
+      if (!history.length) return CATALOG.slice(0, 4).map(d => ({ dish: d, score: 0.5, why: "Popular pick to get you started" }));
+
+      // recency-weighted cuisine affinity + dish frequency
+      const cuisineScore = {}, dishCount = {};
+      const n = history.length;
+      history.forEach((id, i) => {
+        const d = byId[id];
+        if (!d) return;
+        const w = 0.5 + (i + 1) / n; // newer orders weigh more
+        cuisineScore[d.cuisine] = (cuisineScore[d.cuisine] || 0) + w;
+        dishCount[id] = (dishCount[id] || 0) + 1;
+      });
+      const maxCuisine = Math.max(...Object.values(cuisineScore));
+      const recent = new Set(history.slice(-3)); // avoid suggesting the last few
+
+      const scored = CATALOG.map(d => {
+        const affinity = (cuisineScore[d.cuisine] || 0) / maxCuisine; // 0..1, favourite cuisines score high
+        const tried = dishCount[d.id] || 0;
+        const novelty = tried === 0 ? 0.35 : 0; // nudge toward something new in a loved cuisine
+        const fatigue = recent.has(d.id) ? -0.5 : 0; // don't repeat very recent orders
+        const loyalty = tried >= 2 ? 0.15 : 0;       // a fave you order a lot = "order it again"
+        const score = affinity * 0.7 + novelty + loyalty + fatigue;
+
+        let why;
+        const favCuisine = Object.entries(cuisineScore).sort((a,b)=>b[1]-a[1])[0][0];
+        if (tried >= 2) why = `You order ${d.cuisine} often — a repeat favorite`;
+        else if (tried === 0 && affinity > 0.5) why = `New ${d.cuisine} dish — you love ${d.cuisine}`;
+        else if (d.cuisine === favCuisine) why = `Matches your top cuisine: ${favCuisine}`;
+        else why = `Based on your ${d.cuisine} orders`;
+
+        return { dish: d, score, why };
+      });
+
+      return scored.sort((a,b) => b.score - a.score).slice(0, 4);
+    }
+
+    // ---- Rendering ----
+    function render() {
+      const history = loadHistory();
+
+      // recommendations
+      const recos = recommend(history);
+      const maxS = Math.max(...recos.map(r => r.score), 1);
+      document.getElementById("recos").innerHTML = recos.map(r => `
+        <div class="reco">
+          <span class="emoji">${r.dish.emoji}</span>
+          <div class="body">
+            <div class="name">${r.dish.name}</div>
+            <div class="why">${r.why}</div>
+          </div>
+          <span class="score">${Math.round((r.score / maxS) * 100)}%</span>
+        </div>`).join("");
+
+      // history (aggregated counts)
+      const counts = {};
+      history.forEach(id => counts[id] = (counts[id] || 0) + 1);
+      document.getElementById("history").innerHTML = Object.entries(counts)
+        .sort((a,b)=>b[1]-a[1])
+        .map(([id,c]) => `<span class="chip">${byId[id].emoji} ${byId[id].name} ${c>1?`<b>×${c}</b>`:""}</span>`)
+        .join("") || '<span class="chip">No orders yet</span>';
+    }
+
+    // dish picker options
+    document.getElementById("dishPicker").innerHTML =
+      CATALOG.map(d => `<option value="${d.id}">${d.emoji} ${d.name} · ${d.cuisine}</option>`).join("");
+
+    document.getElementById("orderForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const id = document.getElementById("dishPicker").value;
+      const h = loadHistory(); h.push(id); saveHistory(h); render();
+    });
+    document.getElementById("resetBtn").addEventListener("click", () => {
+      saveHistory([...SEED]); render();
+    });
+
+    render();
+  </script>
+</body>
+</html>
