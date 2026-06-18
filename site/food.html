@@ -69,7 +69,17 @@
     .reco .body { flex:1; min-width:0; }
     .reco .name { font-weight:600; font-size:.98rem; }
     .reco .why { font-size:.78rem; color: var(--muted); margin-top:.15rem; }
+    .reco .where { font-size:.76rem; color: var(--text); margin-top:.3rem; }
+    .reco .where .star { color:#ffd166; }
+    .reco .where .dot { color: var(--muted); margin:0 .35rem; }
     .reco .score { font-size:.72rem; font-weight:700; color: var(--accent-2); padding:.15rem .55rem; border-radius:999px; background: rgba(94,231,255,.12); border:1px solid rgba(94,231,255,.2); flex:none; }
+
+    .topspot { display:flex; align-items:center; gap:.9rem; padding:.4rem .2rem; }
+    .topspot .emoji { width:3rem; height:3rem; flex:none; display:grid; place-items:center; font-size:1.5rem; border-radius:14px; background: linear-gradient(145deg, rgba(255,209,102,.25), rgba(179,136,255,.18)); border:1px solid var(--glass-border); }
+    .topspot .name { font-family:"Space Grotesk"; font-weight:700; font-size:1.15rem; }
+    .topspot .meta { font-size:.78rem; color: var(--muted); margin-top:.2rem; }
+    .topspot .meta .star { color:#ffd166; }
+    .topspot .meta .dot { margin:0 .35rem; }
 
     .history { display:flex; flex-wrap:wrap; gap:.4rem; }
     .chip { font-size:.78rem; padding:.3rem .6rem; border-radius:999px; background: rgba(255,255,255,.05); border:1px solid var(--glass-border); }
@@ -100,6 +110,11 @@
     <div class="card">
       <h2>Recommended for you</h2>
       <div id="recos"></div>
+    </div>
+
+    <div class="card">
+      <h2>Best restaurant for these items</h2>
+      <div class="topspot" id="topspot"></div>
     </div>
 
     <div class="card">
@@ -137,6 +152,37 @@
       { id: "biryani",      name: "Veg Biryani",        emoji: "🍚", cuisine: "Indian",   category: "main" },
     ];
     const byId = Object.fromEntries(CATALOG.map(d => [d.id, d]));
+
+    // ---- Restaurant catalog: cuisines served, rating, delivery time (min) ----
+    const RESTAURANTS = [
+      { name: "Bella Napoli",     emoji: "🍕", cuisines: ["Italian"],            rating: 4.8, eta: 25 },
+      { name: "Trattoria Roma",   emoji: "🍝", cuisines: ["Italian"],            rating: 4.5, eta: 35 },
+      { name: "Sakura House",     emoji: "🍣", cuisines: ["Japanese"],           rating: 4.9, eta: 30 },
+      { name: "Ramen Bar 22",     emoji: "🍜", cuisines: ["Japanese"],           rating: 4.6, eta: 20 },
+      { name: "Bangkok Street",   emoji: "🍤", cuisines: ["Thai"],               rating: 4.7, eta: 30 },
+      { name: "El Toro",          emoji: "🌮", cuisines: ["Mexican"],            rating: 4.6, eta: 25 },
+      { name: "The Grill House",  emoji: "🍔", cuisines: ["American"],           rating: 4.4, eta: 20 },
+      { name: "Spice Route",      emoji: "🍛", cuisines: ["Indian"],             rating: 4.8, eta: 35 },
+      { name: "Asia Fusion",      emoji: "🥢", cuisines: ["Japanese","Thai"],    rating: 4.5, eta: 30 },
+      { name: "Global Kitchen",   emoji: "🌍", cuisines: ["Italian","Mexican","American","Indian"], rating: 4.3, eta: 40 },
+    ];
+
+    // Best restaurant for a cuisine: highest rating, then fastest delivery.
+    function bestRestaurantFor(cuisine) {
+      return RESTAURANTS
+        .filter(r => r.cuisines.includes(cuisine))
+        .sort((a, b) => b.rating - a.rating || a.eta - b.eta)[0] || null;
+    }
+
+    // Best single restaurant to cover a set of recommended dishes:
+    // most recommended cuisines covered, then rating, then delivery time.
+    function bestRestaurantForDishes(dishes) {
+      const wanted = new Set(dishes.map(d => d.cuisine));
+      return RESTAURANTS
+        .map(r => ({ r, covers: r.cuisines.filter(c => wanted.has(c)).length }))
+        .filter(x => x.covers > 0)
+        .sort((a, b) => b.covers - a.covers || b.r.rating - a.r.rating || a.r.eta - b.r.eta)[0] || null;
+    }
 
     // ---- Seed order history (most recent last) ----
     const SEED = ["margherita","sushi","margherita","ramen","carbonara","sushi","gyoza","ramen"];
@@ -190,15 +236,32 @@
       // recommendations
       const recos = recommend(history);
       const maxS = Math.max(...recos.map(r => r.score), 1);
-      document.getElementById("recos").innerHTML = recos.map(r => `
+      document.getElementById("recos").innerHTML = recos.map(r => {
+        const spot = bestRestaurantFor(r.dish.cuisine);
+        const where = spot
+          ? `<div class="where">📍 ${spot.name} <span class="star">★ ${spot.rating}</span><span class="dot">·</span>${spot.eta} min</div>`
+          : "";
+        return `
         <div class="reco">
           <span class="emoji">${r.dish.emoji}</span>
           <div class="body">
             <div class="name">${r.dish.name}</div>
             <div class="why">${r.why}</div>
+            ${where}
           </div>
           <span class="score">${Math.round((r.score / maxS) * 100)}%</span>
-        </div>`).join("");
+        </div>`;
+      }).join("");
+
+      // best single restaurant covering the recommended items
+      const top = bestRestaurantForDishes(recos.map(r => r.dish));
+      const covered = top ? top.r.cuisines.filter(c => new Set(recos.map(r => r.dish.cuisine)).has(c)) : [];
+      document.getElementById("topspot").innerHTML = top ? `
+        <span class="emoji">${top.r.emoji}</span>
+        <div>
+          <div class="name">${top.r.name}</div>
+          <div class="meta"><span class="star">★ ${top.r.rating}</span><span class="dot">·</span>${top.r.eta} min delivery<span class="dot">·</span>covers ${covered.join(", ")}</div>
+        </div>` : `<div class="meta">No matching restaurant found.</div>`;
 
       // history (aggregated counts)
       const counts = {};
