@@ -3,146 +3,219 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Tree View</title>
+  <title>Tree View · 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg: #0f172a;
-      --panel: #1e293b;
-      --text: #e2e8f0;
-      --muted: #94a3b8;
-      --accent: #38bdf8;
+      --text: #f4f3ff;
+      --muted: #a5a3c4;
+      --glass: rgba(28, 26, 54, 0.55);
+      --glass-border: rgba(255, 255, 255, 0.10);
+      --accent: #b388ff;
+      --accent-2: #5ee7ff;
+      --row-hover: rgba(255, 255, 255, 0.06);
     }
     * { box-sizing: border-box; }
+    html, body { height: 100%; }
     body {
       margin: 0;
-      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-      background: var(--bg);
+      font-family: "Inter", system-ui, sans-serif;
       color: var(--text);
+      background: #0a0818;
       display: flex;
+      align-items: center;
       justify-content: center;
       padding: 2rem 1rem;
+      overflow-x: hidden;
     }
+    /* animated gradient-mesh backdrop */
+    .mesh {
+      position: fixed;
+      inset: -30%;
+      z-index: -1;
+      background:
+        radial-gradient(40% 40% at 20% 25%, #6d28d9 0%, transparent 60%),
+        radial-gradient(35% 35% at 80% 20%, #0ea5e9 0%, transparent 60%),
+        radial-gradient(45% 45% at 70% 80%, #db2777 0%, transparent 60%),
+        radial-gradient(40% 40% at 25% 85%, #2dd4bf 0%, transparent 60%);
+      filter: blur(60px) saturate(140%);
+      opacity: 0.55;
+      animation: drift 22s ease-in-out infinite alternate;
+    }
+    @keyframes drift {
+      0%   { transform: translate3d(0,0,0) scale(1); }
+      100% { transform: translate3d(2%, -3%, 0) scale(1.12); }
+    }
+
     main {
       width: 100%;
-      max-width: 480px;
+      max-width: 460px;
+      animation: rise 0.7s cubic-bezier(.2,.8,.2,1) both;
+    }
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    header { margin: 0 0 1.25rem; }
+    .eyebrow {
+      font-size: 0.7rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 0 0 0.4rem;
     }
     h1 {
-      font-size: 1.25rem;
-      font-weight: 600;
-      margin: 0 0 1rem;
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin: 0;
+      letter-spacing: -0.01em;
+      background: linear-gradient(92deg, var(--accent-2), var(--accent) 60%, #ff9ecf);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
     }
+
     .tree {
-      background: var(--panel);
-      border-radius: 12px;
+      list-style: none;
+      margin: 0;
       padding: 0.75rem;
-      list-style: none;
-      margin: 0;
+      border-radius: 22px;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(22px) saturate(160%);
+      -webkit-backdrop-filter: blur(22px) saturate(160%);
+      box-shadow:
+        0 24px 60px -20px rgba(0,0,0,0.65),
+        inset 0 1px 0 rgba(255,255,255,0.08);
     }
-    .tree ul {
-      list-style: none;
-      margin: 0;
-      padding-left: 1.25rem;
+    .tree ul { list-style: none; margin: 0; padding-left: 1.5rem; position: relative; }
+    /* guide line */
+    .tree ul::before {
+      content: "";
+      position: absolute;
+      left: 0.55rem; top: 0; bottom: 0.5rem;
+      width: 1px;
+      background: linear-gradient(var(--glass-border), transparent);
     }
+
     .node {
       display: flex;
       align-items: center;
-      gap: 0.4rem;
-      padding: 0.35rem 0.5rem;
-      border-radius: 6px;
-      cursor: default;
-      user-select: none;
-    }
-    .node:hover { background: rgba(148, 163, 184, 0.12); }
-    .node .toggle {
-      width: 1.1rem;
-      text-align: center;
-      color: var(--muted);
+      gap: 0.6rem;
+      padding: 0.55rem 0.7rem;
+      border-radius: 14px;
       cursor: pointer;
-      transition: transform 0.15s ease;
+      user-select: none;
+      transition: background 0.18s ease, transform 0.18s ease;
+    }
+    .node:hover { background: var(--row-hover); transform: translateX(2px); }
+    .node:active { transform: scale(0.99); }
+
+    .toggle {
+      width: 1.1rem; height: 1.1rem;
+      display: grid; place-items: center;
+      color: var(--muted);
+      transition: transform 0.22s cubic-bezier(.2,.8,.2,1);
       flex: none;
     }
-    .node .toggle.empty { visibility: hidden; }
+    .toggle svg { width: 12px; height: 12px; }
+    .toggle.empty { visibility: hidden; }
     li.collapsed > ul { display: none; }
     li.collapsed > .node .toggle { transform: rotate(-90deg); }
-    .icon { flex: none; }
-    .label { flex: 1; }
+
+    .icon {
+      flex: none;
+      width: 1.9rem; height: 1.9rem;
+      display: grid; place-items: center;
+      font-size: 0.95rem;
+      border-radius: 10px;
+      background: linear-gradient(145deg, rgba(179,136,255,0.22), rgba(94,231,255,0.12));
+      border: 1px solid var(--glass-border);
+    }
+    .leaf .icon { background: rgba(255,255,255,0.04); }
+
+    .label { flex: 1; font-size: 0.93rem; font-weight: 500; }
     .count {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--accent-2);
+      padding: 0.1rem 0.5rem;
+      border-radius: 999px;
+      background: rgba(94,231,255,0.12);
+      border: 1px solid rgba(94,231,255,0.2);
+    }
+
+    footer {
+      margin-top: 1rem;
+      text-align: center;
+      font-size: 0.72rem;
       color: var(--muted);
-      font-size: 0.8rem;
+      letter-spacing: 0.04em;
     }
   </style>
 </head>
 <body>
+  <div class="mesh" aria-hidden="true"></div>
   <main>
-    <h1>📁 Project Tree</h1>
+    <header>
+      <p class="eyebrow">File Explorer</p>
+      <h1>Project Tree</h1>
+    </header>
     <ul class="tree" id="tree"></ul>
+    <footer>5 branches · 4 sub-branches each</footer>
   </main>
 
   <script>
     // 5 main branches, each with 4 sub-branches.
     const data = [
-      {
-        label: "Documents",
-        icon: "📁",
-        children: [
-          { label: "Resume.pdf", icon: "📄" },
-          { label: "Cover Letter.docx", icon: "📄" },
-          { label: "Contract.pdf", icon: "📄" },
-          { label: "Invoice.xlsx", icon: "📄" },
-        ],
-      },
-      {
-        label: "Pictures",
-        icon: "📁",
-        children: [
-          { label: "Vacation.jpg", icon: "🖼️" },
-          { label: "Profile.png", icon: "🖼️" },
-          { label: "Screenshot.png", icon: "🖼️" },
-          { label: "Logo.svg", icon: "🖼️" },
-        ],
-      },
-      {
-        label: "Music",
-        icon: "📁",
-        children: [
-          { label: "Track 1.mp3", icon: "🎵" },
-          { label: "Track 2.mp3", icon: "🎵" },
-          { label: "Track 3.mp3", icon: "🎵" },
-          { label: "Playlist.m3u", icon: "🎵" },
-        ],
-      },
-      {
-        label: "Projects",
-        icon: "📁",
-        children: [
-          { label: "tree-view", icon: "📂" },
-          { label: "README.md", icon: "📄" },
-          { label: "index.html", icon: "📄" },
-          { label: "styles.css", icon: "📄" },
-        ],
-      },
-      {
-        label: "Notes",
-        icon: "📁",
-        children: [
-          { label: "todo.txt", icon: "📄" },
-          { label: "ideas.txt", icon: "📄" },
-          { label: "meeting.txt", icon: "📄" },
-          { label: "archive.txt", icon: "📄" },
-        ],
-      },
+      { label: "Documents", icon: "📁", children: [
+        { label: "Resume.pdf", icon: "📄" },
+        { label: "Cover Letter.docx", icon: "📄" },
+        { label: "Contract.pdf", icon: "📄" },
+        { label: "Invoice.xlsx", icon: "📊" },
+      ]},
+      { label: "Pictures", icon: "📁", children: [
+        { label: "Vacation.jpg", icon: "🖼️" },
+        { label: "Profile.png", icon: "🖼️" },
+        { label: "Screenshot.png", icon: "🖼️" },
+        { label: "Logo.svg", icon: "🎨" },
+      ]},
+      { label: "Music", icon: "📁", children: [
+        { label: "Track 1.mp3", icon: "🎵" },
+        { label: "Track 2.mp3", icon: "🎵" },
+        { label: "Track 3.mp3", icon: "🎵" },
+        { label: "Playlist.m3u", icon: "🎧" },
+      ]},
+      { label: "Projects", icon: "📁", children: [
+        { label: "tree-view", icon: "📂" },
+        { label: "README.md", icon: "📄" },
+        { label: "index.html", icon: "🌐" },
+        { label: "styles.css", icon: "🎨" },
+      ]},
+      { label: "Notes", icon: "📁", children: [
+        { label: "todo.txt", icon: "📝" },
+        { label: "ideas.txt", icon: "💡" },
+        { label: "meeting.txt", icon: "📝" },
+        { label: "archive.txt", icon: "🗄️" },
+      ]},
     ];
+
+    const chevron = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>';
 
     function buildNode(item) {
       const li = document.createElement("li");
       const hasChildren = item.children && item.children.length > 0;
 
       const node = document.createElement("div");
-      node.className = "node";
+      node.className = "node" + (hasChildren ? "" : " leaf");
 
       const toggle = document.createElement("span");
       toggle.className = "toggle" + (hasChildren ? "" : " empty");
-      toggle.textContent = "▾";
+      toggle.innerHTML = chevron;
 
       const icon = document.createElement("span");
       icon.className = "icon";
@@ -163,12 +236,7 @@
         const ul = document.createElement("ul");
         item.children.forEach((child) => ul.append(buildNode(child)));
 
-        // toggle expand/collapse
-        const flip = () => li.classList.toggle("collapsed");
-        toggle.addEventListener("click", flip);
-        label.addEventListener("click", flip);
-        icon.addEventListener("click", flip);
-
+        node.addEventListener("click", () => li.classList.toggle("collapsed"));
         li.append(node, ul);
       } else {
         li.append(node);
