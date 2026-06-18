@@ -1,4 +1,4 @@
-# AI-kata-non-dev-group1
+# AI-kata-non-dev-group5
 
 Edit files in `site/`, push to `main`, GitHub Actions deploys to Pages.
 
