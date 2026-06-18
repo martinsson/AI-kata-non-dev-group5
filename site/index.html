@@ -79,7 +79,7 @@
   </main>
 
   <script>
-    // 5 top-level entries, some with children.
+    // 5 main branches, each with 4 sub-branches.
     const data = [
       {
         label: "Documents",
@@ -87,6 +87,8 @@
         children: [
           { label: "Resume.pdf", icon: "📄" },
           { label: "Cover Letter.docx", icon: "📄" },
+          { label: "Contract.pdf", icon: "📄" },
+          { label: "Invoice.xlsx", icon: "📄" },
         ],
       },
       {
@@ -95,18 +97,40 @@
         children: [
           { label: "Vacation.jpg", icon: "🖼️" },
           { label: "Profile.png", icon: "🖼️" },
+          { label: "Screenshot.png", icon: "🖼️" },
+          { label: "Logo.svg", icon: "🖼️" },
         ],
       },
-      { label: "Music", icon: "🎵" },
+      {
+        label: "Music",
+        icon: "📁",
+        children: [
+          { label: "Track 1.mp3", icon: "🎵" },
+          { label: "Track 2.mp3", icon: "🎵" },
+          { label: "Track 3.mp3", icon: "🎵" },
+          { label: "Playlist.m3u", icon: "🎵" },
+        ],
+      },
       {
         label: "Projects",
         icon: "📁",
         children: [
           { label: "tree-view", icon: "📂" },
           { label: "README.md", icon: "📄" },
+          { label: "index.html", icon: "📄" },
+          { label: "styles.css", icon: "📄" },
         ],
       },
-      { label: "Notes.txt", icon: "📄" },
+      {
+        label: "Notes",
+        icon: "📁",
+        children: [
+          { label: "todo.txt", icon: "📄" },
+          { label: "ideas.txt", icon: "📄" },
+          { label: "meeting.txt", icon: "📄" },
+          { label: "archive.txt", icon: "📄" },
+        ],
+      },
     ];
 
     function buildNode(item) {
