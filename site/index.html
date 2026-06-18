@@ -1,3 +1,159 @@
 <!doctype html>
-<title>Hello</title>
-<h1>Hello, world!</h1>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tree View</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #1e293b;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+    main {
+      width: 100%;
+      max-width: 480px;
+    }
+    h1 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 0 0 1rem;
+    }
+    .tree {
+      background: var(--panel);
+      border-radius: 12px;
+      padding: 0.75rem;
+      list-style: none;
+      margin: 0;
+    }
+    .tree ul {
+      list-style: none;
+      margin: 0;
+      padding-left: 1.25rem;
+    }
+    .node {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.35rem 0.5rem;
+      border-radius: 6px;
+      cursor: default;
+      user-select: none;
+    }
+    .node:hover { background: rgba(148, 163, 184, 0.12); }
+    .node .toggle {
+      width: 1.1rem;
+      text-align: center;
+      color: var(--muted);
+      cursor: pointer;
+      transition: transform 0.15s ease;
+      flex: none;
+    }
+    .node .toggle.empty { visibility: hidden; }
+    li.collapsed > ul { display: none; }
+    li.collapsed > .node .toggle { transform: rotate(-90deg); }
+    .icon { flex: none; }
+    .label { flex: 1; }
+    .count {
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>📁 Project Tree</h1>
+    <ul class="tree" id="tree"></ul>
+  </main>
+
+  <script>
+    // 5 top-level entries, some with children.
+    const data = [
+      {
+        label: "Documents",
+        icon: "📁",
+        children: [
+          { label: "Resume.pdf", icon: "📄" },
+          { label: "Cover Letter.docx", icon: "📄" },
+        ],
+      },
+      {
+        label: "Pictures",
+        icon: "📁",
+        children: [
+          { label: "Vacation.jpg", icon: "🖼️" },
+          { label: "Profile.png", icon: "🖼️" },
+        ],
+      },
+      { label: "Music", icon: "🎵" },
+      {
+        label: "Projects",
+        icon: "📁",
+        children: [
+          { label: "tree-view", icon: "📂" },
+          { label: "README.md", icon: "📄" },
+        ],
+      },
+      { label: "Notes.txt", icon: "📄" },
+    ];
+
+    function buildNode(item) {
+      const li = document.createElement("li");
+      const hasChildren = item.children && item.children.length > 0;
+
+      const node = document.createElement("div");
+      node.className = "node";
+
+      const toggle = document.createElement("span");
+      toggle.className = "toggle" + (hasChildren ? "" : " empty");
+      toggle.textContent = "▾";
+
+      const icon = document.createElement("span");
+      icon.className = "icon";
+      icon.textContent = item.icon || "•";
+
+      const label = document.createElement("span");
+      label.className = "label";
+      label.textContent = item.label;
+
+      node.append(toggle, icon, label);
+
+      if (hasChildren) {
+        const count = document.createElement("span");
+        count.className = "count";
+        count.textContent = item.children.length;
+        node.append(count);
+
+        const ul = document.createElement("ul");
+        item.children.forEach((child) => ul.append(buildNode(child)));
+
+        // toggle expand/collapse
+        const flip = () => li.classList.toggle("collapsed");
+        toggle.addEventListener("click", flip);
+        label.addEventListener("click", flip);
+        icon.addEventListener("click", flip);
+
+        li.append(node, ul);
+      } else {
+        li.append(node);
+      }
+      return li;
+    }
+
+    const tree = document.getElementById("tree");
+    data.forEach((item) => tree.append(buildNode(item)));
+  </script>
+</body>
+</html>
