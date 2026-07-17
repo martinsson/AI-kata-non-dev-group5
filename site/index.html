@@ -82,6 +82,36 @@
       padding: 0.4rem 0.5rem;
     }
 
+    .city {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .city input {
+      background: var(--panel-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.5rem 0.6rem;
+      font-size: 0.9rem;
+      min-width: 180px;
+    }
+    .city input::placeholder { color: var(--muted); }
+    button.secondary {
+      background: var(--panel-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 0.5rem 0.9rem;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: border-color 0.15s ease;
+    }
+    button.secondary:hover { border-color: var(--accent); }
+    button.secondary:disabled { opacity: 0.6; cursor: default; }
+    .sep { color: var(--border); }
+
     .chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
     .chip {
       border: 1px solid var(--border);
@@ -176,6 +206,11 @@
 
   <div class="controls">
     <button id="locateBtn" class="primary">Find places near me</button>
+    <span class="sep">|</span>
+    <div class="city">
+      <input id="cityInput" type="text" placeholder="…or enter a city" autocomplete="off" />
+      <button id="cityBtn" class="secondary">Search</button>
+    </div>
     <div class="radius">
       <label for="radius">Radius</label>
       <select id="radius">
@@ -192,8 +227,8 @@
     <div id="map"></div>
     <aside id="panel">
       <div class="status" id="status">
-        Tap <strong>“Find places near me”</strong> and allow location access to see what’s worth
-        visiting nearby.
+        Tap <strong>“Find places near me”</strong> and allow location access — or
+        <strong>enter a city</strong> above — to see what’s worth visiting nearby.
       </div>
     </aside>
   </main>
@@ -225,6 +260,8 @@
       status: document.getElementById("status"),
       btn: document.getElementById("locateBtn"),
       radius: document.getElementById("radius"),
+      cityInput: document.getElementById("cityInput"),
+      cityBtn: document.getElementById("cityBtn"),
     };
 
     // Build category chips
@@ -405,39 +442,79 @@
       return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
     }
 
+    // Place the "centre" marker (your location or a searched city) and run a search.
+    function setCenter(pos, popupText) {
+      lastPos = pos;
+      if (youMarker) map.removeLayer(youMarker);
+      youMarker = L.circleMarker([pos.lat, pos.lon], {
+        radius: 8, color: "#2ecc71", fillColor: "#2ecc71", fillOpacity: 0.9, weight: 2,
+      }).bindPopup(popupText);
+      youMarker.addTo(map);
+      map.setView([pos.lat, pos.lon], 15);
+      search(pos);
+    }
+
+    const cityFallbackHint =
+      ' You can still search by typing a city in the box above.';
+
     function locate() {
       if (!("geolocation" in navigator)) {
-        setStatus("Geolocation is not supported by your browser.", true);
+        setStatus("Geolocation isn’t supported by your browser." + cityFallbackHint, true);
+        els.cityInput.focus();
         return;
       }
       setStatus(`<span class="spinner"></span>Getting your location…`);
       els.btn.disabled = true;
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          const pos = { lat: position.coords.latitude, lon: position.coords.longitude };
-          lastPos = pos;
-          if (youMarker) markerLayer.removeLayer(youMarker);
-          youMarker = L.circleMarker([pos.lat, pos.lon], {
-            radius: 8, color: "#2ecc71", fillColor: "#2ecc71", fillOpacity: 0.9, weight: 2,
-          }).bindPopup("You are here");
-          youMarker.addTo(map);
-          map.setView([pos.lat, pos.lon], 15);
-          search(pos);
+          els.btn.disabled = false;
+          setCenter({ lat: position.coords.latitude, lon: position.coords.longitude }, "You are here");
         },
         (err) => {
           els.btn.disabled = false;
           const msgs = {
-            1: "Location permission was denied. Enable it in your browser to use this app.",
-            2: "Your location is currently unavailable. Try again in a moment.",
-            3: "Timed out getting your location. Try again.",
+            1: "Location permission was denied.",
+            2: "Your location is currently unavailable.",
+            3: "Timed out getting your location.",
           };
-          setStatus(msgs[err.code] || ("Could not get your location: " + err.message), true);
+          setStatus((msgs[err.code] || ("Could not get your location: " + err.message)) + cityFallbackHint, true);
+          els.cityInput.focus();
         },
         { enableHighAccuracy: true, timeout: 12000, maximumAge: 60000 }
       );
     }
 
+    // Geocode a city/place name via OpenStreetMap Nominatim, then search around it.
+    async function searchCity() {
+      const q = els.cityInput.value.trim();
+      if (!q) { els.cityInput.focus(); return; }
+      setStatus(`<span class="spinner"></span>Looking up “${escapeHtml(q)}”…`);
+      els.cityBtn.disabled = true;
+      try {
+        const url = "https://nominatim.openstreetmap.org/search?format=json&limit=1&q=" + encodeURIComponent(q);
+        const res = await fetch(url, { headers: { "Accept": "application/json" } });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const results = await res.json();
+        if (!results.length) {
+          setStatus(`Couldn’t find “${escapeHtml(q)}”. Try a different or more specific name.`, true);
+          return;
+        }
+        const place = results[0];
+        els.cityBtn.disabled = false;
+        setCenter(
+          { lat: parseFloat(place.lat), lon: parseFloat(place.lon) },
+          escapeHtml(place.display_name || q)
+        );
+      } catch (e) {
+        setStatus(`City lookup failed (${e.message}). Please try again in a moment.`, true);
+      } finally {
+        els.cityBtn.disabled = false;
+      }
+    }
+
     els.btn.addEventListener("click", locate);
+    els.cityBtn.addEventListener("click", searchCity);
+    els.cityInput.addEventListener("keydown", (e) => { if (e.key === "Enter") searchCity(); });
     els.radius.addEventListener("change", () => { if (lastPos) search(lastPos); });
   </script>
 </body>
